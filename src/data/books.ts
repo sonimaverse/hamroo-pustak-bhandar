@@ -11,6 +11,7 @@ export const featuredBooks: Book[] = [
     coverTo: 'to-sky-800',
     textColor: 'text-white',
     category: 'SEE',
+    stock: 45,
   },
   {
     id: 'see-physics-guide',
@@ -22,6 +23,7 @@ export const featuredBooks: Book[] = [
     coverTo: 'to-emerald-900',
     textColor: 'text-white',
     category: 'SEE',
+    stock: 38,
   },
   {
     id: 'see-chemistry-guide',
@@ -33,6 +35,7 @@ export const featuredBooks: Book[] = [
     coverTo: 'to-purple-950',
     textColor: 'text-white',
     category: 'SEE',
+    stock: 42,
   },
   {
     id: 'nepali-grammar',
@@ -44,6 +47,7 @@ export const featuredBooks: Book[] = [
     coverTo: 'to-sky-300',
     textColor: 'text-navy-800',
     category: 'Language',
+    stock: 60,
   },
   {
     id: 'the-alchemist',
@@ -55,6 +59,7 @@ export const featuredBooks: Book[] = [
     coverTo: 'to-black',
     textColor: 'text-gold-300',
     category: 'Fiction',
+    stock: 25,
   },
   {
     id: 'mero-sangharsha',
@@ -66,6 +71,7 @@ export const featuredBooks: Book[] = [
     coverTo: 'to-red-950',
     textColor: 'text-white',
     category: 'Biography',
+    stock: 30,
   },
   {
     id: 'rich-dad-poor-dad',
@@ -77,6 +83,7 @@ export const featuredBooks: Book[] = [
     coverTo: 'to-navy-900',
     textColor: 'text-gold-300',
     category: 'Finance',
+    stock: 35,
   },
   {
     id: 'lucents-gk',
@@ -88,5 +95,17 @@ export const featuredBooks: Book[] = [
     coverTo: 'to-blue-700',
     textColor: 'text-white',
     category: 'Reference',
+    stock: 50,
   },
+];
+
+export const stationeryItems = [
+  { id: 'pen-set', name: 'Premium Pen Set', retailPrice: 150, wholesalePrice: 110, stock: 200, icon: '✏️' },
+  { id: 'notebook', name: 'Hardcover Notebook', retailPrice: 120, wholesalePrice: 85, stock: 150, icon: '📓' },
+  { id: 'geometry-box', name: 'Geometry Box', retailPrice: 200, wholesalePrice: 150, stock: 80, icon: '📐' },
+  { id: 'pencil-case', name: 'Pencil Case', retailPrice: 180, wholesalePrice: 130, stock: 100, icon: '✏️' },
+  { id: 'folder-set', name: 'Document Folder Set', retailPrice: 250, wholesalePrice: 180, stock: 60, icon: '📁' },
+  { id: 'art-kit', name: 'Art & Craft Kit', retailPrice: 350, wholesalePrice: 260, stock: 40, icon: '🎨' },
+  { id: 'calculator', name: 'Scientific Calculator', retailPrice: 450, wholesalePrice: 340, stock: 25, icon: '🧮' },
+  { id: 'backpack', name: 'Student Backpack', retailPrice: 800, wholesalePrice: 600, stock: 30, icon: '🎒' },
 ];

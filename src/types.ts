@@ -10,10 +10,20 @@ export interface Book {
   /** Text colour that reads well on the cover gradient */
   textColor: string;
   category: string;
+  stock: number;
 }
 
 export interface NavLink {
   label: string;
   href: string;
   children?: { label: string; href: string }[];
+}
+
+export interface StationeryItem {
+  id: string;
+  name: string;
+  retailPrice: number;
+  wholesalePrice: number;
+  stock: number;
+  icon: string;
 }

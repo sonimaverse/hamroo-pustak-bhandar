@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { Menu, X, ShieldCheck, FileText } from 'lucide-react';
+import { Menu, X, ShieldCheck, FileText, ShoppingCart } from 'lucide-react';
+import { useCart } from '../context/CartContext';
 
 const navLinks = [
   { label: 'Home', href: '#home' },
@@ -12,9 +13,11 @@ const navLinks = [
 interface HeaderProps {
   onSwitchToAdmin: () => void;
   onOpenEnquiry: () => void;
+  onToggleCart: () => void;
 }
 
-export default function Header({ onSwitchToAdmin, onOpenEnquiry }: HeaderProps) {
+export default function Header({ onSwitchToAdmin, onOpenEnquiry, onToggleCart }: HeaderProps) {
+  const { totalItems } = useCart();
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
@@ -50,12 +53,26 @@ export default function Header({ onSwitchToAdmin, onOpenEnquiry }: HeaderProps) 
 
         <div className="hidden items-center gap-3 lg:flex">
           <button
+            onClick={onToggleCart}
+            className="relative rounded-full border border-gold-500/30 bg-gold-500/10 px-4 py-2 text-xs font-bold tracking-wider text-gold-300 transition hover:bg-gold-500/20"
+          >
+            <span className="flex items-center gap-2">
+              <ShoppingCart size={14} />
+              CART
+              {totalItems > 0 && (
+                <span className="flex h-4 w-4 items-center justify-center rounded-full bg-gold-500 text-[10px] font-bold text-brown-900">
+                  {totalItems}
+                </span>
+              )}
+            </span>
+          </button>
+          <button
             onClick={onOpenEnquiry}
             className="rounded-full border border-gold-500/30 bg-gold-500/10 px-4 py-2 text-xs font-bold tracking-wider text-gold-300 transition hover:bg-gold-500/20"
           >
             <span className="flex items-center gap-2">
               <FileText size={14} />
-              ENQUIRY
+              BULK ORDER
             </span>
           </button>
           <button
@@ -90,10 +107,16 @@ export default function Header({ onSwitchToAdmin, onOpenEnquiry }: HeaderProps) 
               </a>
             ))}
             <button
+              onClick={() => { onToggleCart(); setMobileOpen(false); }}
+              className="rounded-lg border border-gold-500/30 bg-gold-500/10 px-4 py-3 text-left text-sm font-bold tracking-wider text-gold-300"
+            >
+              Cart {totalItems > 0 && `(${totalItems})`}
+            </button>
+            <button
               onClick={() => { onOpenEnquiry(); setMobileOpen(false); }}
               className="rounded-lg border border-gold-500/30 bg-gold-500/10 px-4 py-3 text-left text-sm font-bold tracking-wider text-gold-300"
             >
-              Institutional Enquiry
+              Bulk Order
             </button>
             <button
               onClick={() => { onSwitchToAdmin(); setMobileOpen(false); }}

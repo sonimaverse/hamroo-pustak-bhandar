@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { CartProvider } from './context/CartContext';
 import PortalSelect from './components/PortalSelect';
 import AdminLogin from './components/AdminLogin';
 import AdminDashboard from './components/AdminDashboard';
@@ -6,14 +7,17 @@ import Header from './components/Header';
 import Hero from './components/Hero';
 import TrustBar from './components/TrustBar';
 import FeaturedBooks from './components/FeaturedBooks';
+import StationerySection from './components/StationerySection';
 import Footer from './components/Footer';
-import EnquiryModal from './components/EnquiryModal';
+import BulkOrderForm from './components/BulkOrderForm';
+import CartPanel from './components/CartPanel';
 
 type View = 'select' | 'customer' | 'admin-login' | 'admin-dashboard';
 
 function App() {
   const [view, setView] = useState<View>('select');
   const [isEnquiryOpen, setIsEnquiryOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   if (view === 'select') {
     return (
@@ -38,14 +42,26 @@ function App() {
   }
 
   return (
-    <div className="min-h-screen bg-cream-50">
-      <Header onSwitchToAdmin={() => setView('admin-login')} onOpenEnquiry={() => setIsEnquiryOpen(true)} />
-      <Hero onOpenEnquiry={() => setIsEnquiryOpen(true)} />
-      <TrustBar />
-      <FeaturedBooks onOpenEnquiry={() => setIsEnquiryOpen(true)} />
-      <Footer />
-      <EnquiryModal isOpen={isEnquiryOpen} onClose={() => setIsEnquiryOpen(false)} />
-    </div>
+    <CartProvider>
+      <div className="min-h-screen bg-[#1a1209]">
+        <Header
+          onSwitchToAdmin={() => setView('admin-login')}
+          onOpenEnquiry={() => setIsEnquiryOpen(true)}
+          onToggleCart={() => setIsCartOpen((v) => !v)}
+        />
+        <Hero onOpenEnquiry={() => setIsEnquiryOpen(true)} />
+        <TrustBar />
+        <FeaturedBooks onOpenEnquiry={() => setIsEnquiryOpen(true)} />
+        <StationerySection onOpenEnquiry={() => setIsEnquiryOpen(true)} />
+        <Footer />
+        <CartPanel
+          isOpen={isCartOpen}
+          onClose={() => setIsCartOpen(false)}
+          onOpenEnquiry={() => setIsEnquiryOpen(true)}
+        />
+        <BulkOrderForm isOpen={isEnquiryOpen} onClose={() => setIsEnquiryOpen(false)} />
+      </div>
+    </CartProvider>
   );
 }
 
