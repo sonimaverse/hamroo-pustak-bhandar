@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { motion } from 'framer-motion';
 import { LogOut, TrendingUp, Package, Users, Warehouse, BookOpen, Search, Plus, Minus } from 'lucide-react';
 import { featuredBooks, stationeryItems } from '../data/books';
 import { Book } from '../types';
@@ -51,74 +52,88 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-[#1a1209]">
-      <header className="flex items-center justify-between bg-[#2d1a0a] px-6 py-4 text-white border-b border-gold-500/10">
+    <div className="min-h-screen bg-ivory-50">
+      <header className="flex items-center justify-between border-b border-coffee-100 bg-white px-6 py-4">
         <div>
-          <p className="font-serif text-lg font-bold text-gold-200">Hamro Pustak Bhandar</p>
-          <p className="text-xs text-gold-400/60">Admin Portal</p>
+          <p className="font-serif text-lg font-bold text-coffee-800">Hamro Pustak Bhandar</p>
+          <p className="text-xs text-slate-500">Admin Portal</p>
         </div>
-        <button
+        <motion.button
           onClick={onLogout}
-          className="flex items-center gap-2 rounded-lg border border-gold-500/20 px-4 py-2 text-sm font-medium text-gold-300 transition hover:bg-gold-500/10"
+          className="flex items-center gap-2 rounded-xl border border-coffee-200 px-4 py-2 text-sm font-medium text-coffee-700 transition hover:border-gold-300"
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.98 }}
         >
           <LogOut size={16} />
           Log out
-        </button>
+        </motion.button>
       </header>
 
-      <main className="mx-auto max-w-6xl px-4 py-8 sm:px-6 lg:px-8">
-        <div className="mb-4 rounded-lg border border-gold-500/20 bg-gold-500/5 px-4 py-3 text-sm text-gold-300">
+      <main className="mx-auto max-w-6xl px-6 py-8 sm:px-8 lg:px-12">
+        <div className="mb-8 rounded-2xl border border-coffee-100 bg-white p-4 text-sm text-coffee-600 shadow-sm">
           Admin dashboard for managing inventory, pricing, orders, and payment integrations (eSewa/Khalti).
         </div>
 
         <div className="mb-8 grid grid-cols-2 gap-4 sm:grid-cols-4">
           {stats.map(({ label, value, icon: Icon }) => (
-            <div key={label} className="rounded-xl border border-gold-500/10 bg-[#2d1a0a]/60 p-5 shadow-soft">
-              <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gold-500/10 text-gold-400">
+            <motion.div
+              key={label}
+              className="rounded-2xl border border-coffee-100 bg-white p-5 shadow-sm"
+              whileHover={{ y: -2 }}
+              transition={{ duration: 0.2 }}
+            >
+              <span className="flex h-10 w-10 items-center justify-center rounded-xl border border-gold-200 bg-gold-50 text-gold-600">
                 <Icon size={18} />
               </span>
-              <p className="mt-3 text-2xl font-bold text-gold-200">{value}</p>
-              <p className="text-xs text-gold-400/60">{label}</p>
-            </div>
+              <p className="mt-3 text-2xl font-bold text-coffee-800">{value}</p>
+              <p className="text-xs text-slate-500">{label}</p>
+            </motion.div>
           ))}
         </div>
 
         <div className="mb-6 flex gap-2 overflow-x-auto">
           {tabs.map((tab) => (
-            <button
+            <motion.button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`flex items-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold tracking-widest transition whitespace-nowrap ${
                 activeTab === tab.id
-                  ? 'bg-gold-500 text-brown-900 shadow-[0_0_20px_rgba(212,168,87,0.3)]'
-                  : 'border border-gold-500/20 bg-gold-500/5 text-gold-300/70 hover:border-gold-500/40 hover:text-gold-200'
+                  ? 'bg-coffee-700 text-ivory-50 shadow-md'
+                  : 'border border-coffee-200 bg-white text-coffee-600 hover:border-gold-300 hover:text-coffee-800'
               }`}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
             >
               <tab.icon size={14} />
               {tab.label}
-            </button>
+            </motion.button>
           ))}
         </div>
 
         {activeTab === 'inventory' && (
-          <div className="rounded-xl border border-gold-500/10 bg-[#2d1a0a]/40 p-6 shadow-soft">
+          <motion.div
+            className="rounded-2xl border border-coffee-100 bg-white p-6 shadow-sm"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
             <div className="mb-4 flex items-center justify-between">
-              <h2 className="font-serif text-lg font-bold text-gold-200">Inventory Management</h2>
+              <h2 className="font-serif text-lg font-bold text-coffee-800">Inventory Management</h2>
               <div className="relative">
-                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gold-400/60" />
+                <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
                   placeholder="Search items..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="rounded-full border border-gold-500/20 bg-[#1a1209]/60 pl-9 pr-4 py-2 text-sm text-gold-200 outline-none placeholder:text-gold-400/40 focus:border-gold-500/40"
+                  className="rounded-xl border border-coffee-200 bg-ivory-50 pl-9 pr-4 py-2 text-sm text-coffee-800 outline-none placeholder:text-slate-400 focus:border-gold-400 focus:ring-2 focus:ring-gold-100"
                 />
               </div>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-gold-500/10 text-gold-400/60">
+                  <tr className="border-b border-coffee-100 text-slate-500">
                     <th className="py-3 pr-4 font-medium">Item</th>
                     <th className="py-3 pr-4 font-medium">Category</th>
                     <th className="py-3 pr-4 font-medium">Retail Price</th>
@@ -129,23 +144,23 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </thead>
                 <tbody>
                   {filteredItems.map((item) => (
-                    <tr key={item.id} className="border-b border-gold-500/5">
-                      <td className="py-3 pr-4 text-gold-200">
+                    <tr key={item.id} className="border-b border-coffee-50">
+                      <td className="py-3 pr-4 text-coffee-800">
                         {item.type === 'book' ? item.title : item.name}
                       </td>
-                      <td className="py-3 pr-4 text-gold-400/60">
+                      <td className="py-3 pr-4 text-slate-500">
                         {item.type === 'book' ? item.category : 'Stationery'}
                       </td>
-                      <td className="py-3 pr-4 text-gold-300">Rs. {item.retailPrice}</td>
-                      <td className="py-3 pr-4 text-gold-300">Rs. {item.wholesalePrice}</td>
+                      <td className="py-3 pr-4 text-coffee-700">Rs. {item.retailPrice}</td>
+                      <td className="py-3 pr-4 text-coffee-700">Rs. {item.wholesalePrice}</td>
                       <td className="py-3 pr-4">
                         <span
                           className={`font-bold ${
                             (inventory[item.id] || 0) < 10
-                              ? 'text-red-400'
+                              ? 'text-red-600'
                               : (inventory[item.id] || 0) < 30
-                              ? 'text-yellow-400'
-                              : 'text-emerald-400'
+                              ? 'text-amber-600'
+                              : 'text-emerald-600'
                           }`}
                         >
                           {inventory[item.id] || 0}
@@ -153,21 +168,25 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                       </td>
                       <td className="py-3">
                         <div className="flex items-center gap-2">
-                          <button
+                          <motion.button
                             onClick={() => updateStock(item.id, -1)}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg border border-gold-500/20 text-gold-400 transition hover:bg-gold-500/10"
+                            className="flex h-7 w-7 items-center justify-center rounded-lg border border-coffee-200 text-coffee-600 transition hover:bg-coffee-50"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                           >
                             <Minus size={12} />
-                          </button>
-                          <span className="text-xs font-bold text-gold-200 w-8 text-center">
+                          </motion.button>
+                          <span className="text-xs font-bold text-coffee-800 w-8 text-center">
                             {inventory[item.id] || 0}
                           </span>
-                          <button
+                          <motion.button
                             onClick={() => updateStock(item.id, 1)}
-                            className="flex h-7 w-7 items-center justify-center rounded-lg border border-gold-500/20 text-gold-400 transition hover:bg-gold-500/10"
+                            className="flex h-7 w-7 items-center justify-center rounded-lg border border-coffee-200 text-coffee-600 transition hover:bg-coffee-50"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.9 }}
                           >
                             <Plus size={12} />
-                          </button>
+                          </motion.button>
                         </div>
                       </td>
                     </tr>
@@ -175,16 +194,21 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </tbody>
               </table>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {activeTab === 'pricing' && (
-          <div className="rounded-xl border border-gold-500/10 bg-[#2d1a0a]/40 p-6 shadow-soft">
-            <h2 className="mb-4 font-serif text-lg font-bold text-gold-200">Wholesale vs. Retail Pricing</h2>
+          <motion.div
+            className="rounded-2xl border border-coffee-100 bg-white p-6 shadow-sm"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <h2 className="mb-4 font-serif text-lg font-bold text-coffee-800">Wholesale vs. Retail Pricing</h2>
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm">
                 <thead>
-                  <tr className="border-b border-gold-500/10 text-gold-400/60">
+                  <tr className="border-b border-coffee-100 text-slate-500">
                     <th className="py-2 pr-4 font-medium">Title</th>
                     <th className="py-2 pr-4 font-medium">Retail Price</th>
                     <th className="py-2 pr-4 font-medium">Wholesale Price</th>
@@ -193,94 +217,124 @@ export default function AdminDashboard({ onLogout }: AdminDashboardProps) {
                 </thead>
                 <tbody>
                   {featuredBooks.map((row) => (
-                    <tr key={row.id} className="border-b border-gold-500/5">
-                      <td className="py-2.5 pr-4 text-gold-200">{row.title}</td>
-                      <td className="py-2.5 pr-4 text-gold-300">Rs. {row.retailPrice}</td>
-                      <td className="py-2.5 pr-4 text-gold-300">Rs. {row.wholesalePrice}</td>
-                      <td className="py-2.5 text-emerald-400">Rs. {row.retailPrice - row.wholesalePrice}</td>
+                    <tr key={row.id} className="border-b border-coffee-50">
+                      <td className="py-2.5 pr-4 text-coffee-800">{row.title}</td>
+                      <td className="py-2.5 pr-4 text-coffee-700">Rs. {row.retailPrice}</td>
+                      <td className="py-2.5 pr-4 text-coffee-700">Rs. {row.wholesalePrice}</td>
+                      <td className="py-2.5 text-emerald-600">Rs. {row.retailPrice - row.wholesalePrice}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             </div>
-          </div>
+          </motion.div>
         )}
 
         {activeTab === 'orders' && (
-          <div className="rounded-xl border border-gold-500/10 bg-[#2d1a0a]/40 p-6 shadow-soft">
-            <h2 className="mb-4 font-serif text-lg font-bold text-gold-200">Recent Orders</h2>
+          <motion.div
+            className="rounded-2xl border border-coffee-100 bg-white p-6 shadow-sm"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <h2 className="mb-4 font-serif text-lg font-bold text-coffee-800">Recent Orders</h2>
             <div className="space-y-3">
               {[
                 { id: 'ORD-001', customer: 'Kathmandu College', items: 5, total: 'Rs. 12,500', status: 'Pending' },
                 { id: 'ORD-002', customer: 'St. Xavier School', items: 12, total: 'Rs. 8,400', status: 'Processing' },
                 { id: 'ORD-003', customer: 'Bharatpur Office', items: 3, total: 'Rs. 3,200', status: 'Delivered' },
               ].map((order) => (
-                <div key={order.id} className="flex items-center justify-between rounded-lg border border-gold-500/10 bg-[#1a1209]/40 p-4">
+                <motion.div
+                  key={order.id}
+                  className="flex items-center justify-between rounded-2xl border border-coffee-100 bg-ivory-50/80 p-4"
+                  whileHover={{ y: -1 }}
+                >
                   <div>
-                    <p className="text-sm font-bold text-gold-200">{order.id}</p>
-                    <p className="text-xs text-gold-400/60">{order.customer}</p>
+                    <p className="text-sm font-bold text-coffee-800">{order.id}</p>
+                    <p className="text-xs text-slate-500">{order.customer}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-bold text-gold-300">{order.total}</p>
-                    <p className="text-xs text-gold-400/60">{order.items} items</p>
+                    <p className="text-sm font-bold text-coffee-700">{order.total}</p>
+                    <p className="text-xs text-slate-500">{order.items} items</p>
                   </div>
                   <span
                     className={`rounded-full px-3 py-1 text-xs font-bold ${
                       order.status === 'Delivered'
-                        ? 'bg-emerald-600/20 text-emerald-400'
+                        ? 'bg-emerald-100 text-emerald-700'
                         : order.status === 'Processing'
-                        ? 'bg-yellow-600/20 text-yellow-400'
-                        : 'bg-gold-500/20 text-gold-400'
+                        ? 'bg-amber-100 text-amber-700'
+                        : 'bg-gold-100 text-gold-700'
                     }`}
                   >
                     {order.status}
                   </span>
-                </div>
+                </motion.div>
               ))}
             </div>
-          </div>
+          </motion.div>
         )}
 
         {activeTab === 'payments' && (
-          <div className="rounded-xl border border-gold-500/10 bg-[#2d1a0a]/40 p-6 shadow-soft">
-            <h2 className="mb-4 font-serif text-lg font-bold text-gold-200">Payment Integrations</h2>
+          <motion.div
+            className="rounded-2xl border border-coffee-100 bg-white p-6 shadow-sm"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <h2 className="mb-4 font-serif text-lg font-bold text-coffee-800">Payment Integrations</h2>
             <div className="grid gap-4 sm:grid-cols-2">
-              <div className="rounded-xl border border-gold-500/10 bg-[#1a1209]/40 p-6">
+              <div className="rounded-2xl border border-coffee-100 bg-ivory-50/80 p-6">
                 <div className="mb-2 flex items-center gap-3">
-                  <span className="text-2xl font-bold text-purple-400">eSewa</span>
-                  <span className="rounded-full bg-emerald-600/20 px-2 py-0.5 text-xs font-bold text-emerald-400">Active</span>
+                  <span className="text-2xl font-bold text-purple-600">eSewa</span>
+                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700">Active</span>
                 </div>
-                <p className="text-sm text-gold-400/60">Digital wallet payment integration</p>
-                <p className="mt-2 text-xs text-gold-400/40">Merchant ID: ************1234</p>
-                <button className="mt-4 rounded-lg border border-gold-500/20 bg-gold-500/10 px-4 py-2 text-xs font-bold text-gold-300 transition hover:bg-gold-500/20">
+                <p className="text-sm text-slate-500">Digital wallet payment integration</p>
+                <p className="mt-2 text-xs text-slate-400">Merchant ID: ************1234</p>
+                <motion.button
+                  className="mt-4 rounded-xl border border-coffee-200 bg-white px-4 py-2 text-xs font-bold text-coffee-700 transition hover:border-gold-300"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
                   Configure
-                </button>
+                </motion.button>
               </div>
-              <div className="rounded-xl border border-gold-500/10 bg-[#1a1209]/40 p-6">
+              <div className="rounded-2xl border border-coffee-100 bg-ivory-50/80 p-6">
                 <div className="mb-2 flex items-center gap-3">
-                  <span className="text-2xl font-bold text-blue-400">Khalti</span>
-                  <span className="rounded-full bg-emerald-600/20 px-2 py-0.5 text-xs font-bold text-emerald-400">Active</span>
+                  <span className="text-2xl font-bold text-blue-600">Khalti</span>
+                  <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-bold text-emerald-700">Active</span>
                 </div>
-                <p className="text-sm text-gold-400/60">Digital wallet payment integration</p>
-                <p className="mt-2 text-xs text-gold-400/40">Merchant ID: ************5678</p>
-                <button className="mt-4 rounded-lg border border-gold-500/20 bg-gold-500/10 px-4 py-2 text-xs font-bold text-gold-300 transition hover:bg-gold-500/20">
+                <p className="text-sm text-slate-500">Digital wallet payment integration</p>
+                <p className="mt-2 text-xs text-slate-400">Merchant ID: ************5678</p>
+                <motion.button
+                  className="mt-4 rounded-xl border border-coffee-200 bg-white px-4 py-2 text-xs font-bold text-coffee-700 transition hover:border-gold-300"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
                   Configure
-                </button>
+                </motion.button>
               </div>
             </div>
-            <div className="mt-6 rounded-xl border border-gold-500/10 bg-[#1a1209]/40 p-6">
-              <h3 className="mb-2 text-sm font-bold text-gold-200">Payment Settings</h3>
-              <p className="text-xs text-gold-400/60">Configure payment gateway credentials, callback URLs, and webhook settings for eSewa and Khalti integrations.</p>
+            <div className="mt-6 rounded-2xl border border-coffee-100 bg-ivory-50/80 p-6">
+              <h3 className="mb-2 text-sm font-bold text-coffee-800">Payment Settings</h3>
+              <p className="text-xs text-slate-500">Configure payment gateway credentials, callback URLs, and webhook settings for eSewa and Khalti integrations.</p>
               <div className="mt-4 flex gap-3">
-                <button className="rounded-lg border border-gold-500/20 bg-gold-500/10 px-4 py-2 text-xs font-bold text-gold-300 transition hover:bg-gold-500/20">
+                <motion.button
+                  className="rounded-xl border border-coffee-200 bg-white px-4 py-2 text-xs font-bold text-coffee-700 transition hover:border-gold-300"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
                   eSewa Settings
-                </button>
-                <button className="rounded-lg border border-gold-500/20 bg-gold-500/10 px-4 py-2 text-xs font-bold text-gold-300 transition hover:bg-gold-500/20">
+                </motion.button>
+                <motion.button
+                  className="rounded-xl border border-coffee-200 bg-white px-4 py-2 text-xs font-bold text-coffee-700 transition hover:border-gold-300"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
                   Khalti Settings
-                </button>
+                </motion.button>
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
       </main>
     </div>

@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { ShieldCheck, Store } from 'lucide-react';
 
 interface PortalSelectProps {
@@ -5,44 +6,74 @@ interface PortalSelectProps {
   onSelectAdmin: () => void;
 }
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.15, delayChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6 } },
+};
+
 export default function PortalSelect({ onSelectCustomer, onSelectAdmin }: PortalSelectProps) {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#1a1209] px-4">
-      <div className="w-full max-w-3xl text-center">
-        <span className="font-script text-5xl text-gold-400">Hamro</span>
-        <h1 className="mt-1 font-serif text-3xl font-extrabold text-gold-200 sm:text-4xl">
-          PUSTAK BHANDAR
-        </h1>
-        <p className="mt-3 text-gold-400/60">Choose how you&rsquo;d like to continue</p>
+    <div className="flex min-h-screen items-center justify-center bg-ivory-50 px-4">
+      <motion.div
+        className="w-full max-w-3xl text-center"
+        initial="hidden"
+        animate="visible"
+        variants={containerVariants}
+      >
+        <motion.div variants={itemVariants}>
+          <span className="font-script text-5xl text-gold-600">Hamro</span>
+          <h1 className="mt-1 font-serif text-3xl font-extrabold text-coffee-700 sm:text-4xl">
+            PUSTAK BHANDAR
+          </h1>
+          <p className="mt-3 text-slate-500">Choose how you&rsquo;d like to continue</p>
+        </motion.div>
 
-        <div className="mt-10 grid grid-cols-1 gap-6 sm:grid-cols-2">
-          <button
+        <motion.div className="mt-12 grid grid-cols-1 gap-6 sm:grid-cols-2" variants={containerVariants}>
+          <motion.button
             onClick={onSelectCustomer}
-            className="group flex flex-col items-center gap-4 rounded-2xl border border-gold-500/20 bg-[#2d1a0a]/60 px-8 py-10 shadow-soft transition hover:-translate-y-1 hover:border-gold-500/40 hover:shadow-[0_8px_30px_rgba(212,168,87,0.15)]"
+            className="group flex flex-col items-center gap-5 rounded-3xl border border-coffee-100 bg-white px-8 py-10 shadow-lg shadow-coffee-900/5 transition-all duration-300 hover:-translate-y-1 hover:border-gold-300 hover:shadow-xl hover:shadow-coffee-900/10"
+            variants={itemVariants}
+            whileHover={{ y: -4 }}
           >
-            <span className="flex h-16 w-16 items-center justify-center rounded-full border border-gold-500/30 bg-gold-500/10 text-gold-400 transition group-hover:bg-gold-500 group-hover:text-brown-900">
+            <motion.span
+              className="flex h-16 w-16 items-center justify-center rounded-2xl border border-gold-200 bg-gold-50 text-gold-600 transition-colors duration-300 group-hover:bg-gold-600 group-hover:text-white"
+              whileHover={{ scale: 1.05 }}
+            >
               <Store size={30} strokeWidth={1.8} />
-            </span>
-            <span className="font-serif text-xl font-bold text-gold-200">Customer Portal</span>
-            <span className="text-sm text-gold-400/60">
+            </motion.span>
+            <span className="font-serif text-xl font-bold text-coffee-700">Customer Portal</span>
+            <span className="text-sm text-slate-500">
               Browse and shop books, stationery &amp; more &mdash; no account needed.
             </span>
-          </button>
+          </motion.button>
 
-          <button
+          <motion.button
             onClick={onSelectAdmin}
-            className="group flex flex-col items-center gap-4 rounded-2xl border border-gold-500/20 bg-[#2d1a0a]/60 px-8 py-10 shadow-soft transition hover:-translate-y-1 hover:border-gold-500/40 hover:shadow-[0_8px_30px_rgba(212,168,87,0.15)]"
+            className="group flex flex-col items-center gap-5 rounded-3xl border border-coffee-100 bg-white px-8 py-10 shadow-lg shadow-coffee-900/5 transition-all duration-300 hover:-translate-y-1 hover:border-gold-300 hover:shadow-xl hover:shadow-coffee-900/10"
+            variants={itemVariants}
+            whileHover={{ y: -4 }}
           >
-            <span className="flex h-16 w-16 items-center justify-center rounded-full border border-gold-500/30 bg-gold-500/10 text-gold-400 transition group-hover:bg-gold-500 group-hover:text-brown-900">
+            <motion.span
+              className="flex h-16 w-16 items-center justify-center rounded-2xl border border-gold-200 bg-gold-50 text-gold-600 transition-colors duration-300 group-hover:bg-gold-600 group-hover:text-white"
+              whileHover={{ scale: 1.05 }}
+            >
               <ShieldCheck size={30} strokeWidth={1.8} />
-            </span>
-            <span className="font-serif text-xl font-bold text-gold-200">Admin Portal</span>
-            <span className="text-sm text-gold-400/60">
+            </motion.span>
+            <span className="font-serif text-xl font-bold text-coffee-700">Admin Portal</span>
+            <span className="text-sm text-slate-500">
               Staff login required &mdash; manage inventory, orders &amp; pricing.
             </span>
-          </button>
-        </div>
-      </div>
+          </motion.button>
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

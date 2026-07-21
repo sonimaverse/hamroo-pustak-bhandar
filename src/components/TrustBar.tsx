@@ -1,3 +1,4 @@
+import { motion } from 'framer-motion';
 import { BadgeCheck, Tag, Truck, ShieldCheck, Headphones, Landmark } from 'lucide-react';
 
 const items = [
@@ -9,22 +10,46 @@ const items = [
   { icon: Landmark, title: 'Wholesale Available', subtitle: 'Best rates for dealers' },
 ];
 
+const containerVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { staggerChildren: 0.08, delayChildren: 0.1 },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+};
+
 export default function TrustBar() {
   return (
-    <section className="relative z-10 mx-auto -mt-8 max-w-7xl px-4 sm:px-6 lg:px-8">
-      <div className="grid grid-cols-2 gap-6 rounded-2xl border border-gold-500/10 bg-[#2d1a0a]/90 px-6 py-6 shadow-[0_8px_30px_rgba(0,0,0,0.3)] backdrop-blur-sm sm:grid-cols-3 lg:grid-cols-6">
+    <section className="relative z-10 mx-auto max-w-7xl px-6 sm:px-8 lg:px-12">
+      <motion.div
+        className="grid grid-cols-2 gap-4 rounded-3xl border border-coffee-100 bg-white/90 px-6 py-8 shadow-xl shadow-coffee-900/5 backdrop-blur-xl sm:grid-cols-3 lg:grid-cols-6"
+        initial="hidden"
+        whileInView="visible"
+        viewport={{ once: true, margin: '-50px' }}
+        variants={containerVariants}
+      >
         {items.map(({ icon: Icon, title, subtitle }) => (
-          <div key={title} className="flex items-center gap-3">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full border border-gold-500/20 bg-gold-500/10 text-gold-400">
+          <motion.div
+            key={title}
+            className="flex flex-col items-center gap-3 text-center lg:flex-row lg:items-center lg:text-left lg:gap-3"
+            variants={itemVariants}
+          >
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-gold-200 bg-gold-50 text-gold-600">
               <Icon size={20} strokeWidth={1.8} />
             </span>
             <span>
-              <span className="block text-sm font-semibold text-gold-200">{title}</span>
-              <span className="block text-xs text-gold-400/60">{subtitle}</span>
+              <span className="block text-sm font-semibold text-coffee-700">{title}</span>
+              <span className="block text-xs text-slate-500">{subtitle}</span>
             </span>
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
     </section>
   );
 }

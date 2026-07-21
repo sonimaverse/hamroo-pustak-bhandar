@@ -8,6 +8,8 @@ import Hero from './components/Hero';
 import TrustBar from './components/TrustBar';
 import FeaturedBooks from './components/FeaturedBooks';
 import StationerySection from './components/StationerySection';
+import WhyChooseUs from './components/WhyChooseUs';
+import Testimonials from './components/Testimonials';
 import Footer from './components/Footer';
 import BulkOrderForm from './components/BulkOrderForm';
 import CartPanel from './components/CartPanel';
@@ -43,7 +45,7 @@ function App() {
 
   return (
     <CartProvider>
-      <div className="min-h-screen bg-[#1a1209]">
+      <div className="min-h-screen bg-ivory-50">
         <Header
           onSwitchToAdmin={() => setView('admin-login')}
           onOpenEnquiry={() => setIsEnquiryOpen(true)}
@@ -53,6 +55,8 @@ function App() {
         <TrustBar />
         <FeaturedBooks onOpenEnquiry={() => setIsEnquiryOpen(true)} />
         <StationerySection onOpenEnquiry={() => setIsEnquiryOpen(true)} />
+        <WhyChooseUs />
+        <Testimonials />
         <Footer />
         <CartPanel
           isOpen={isCartOpen}
