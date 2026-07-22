@@ -1,22 +1,17 @@
 import Product from '../models/product.model.js';
-import { Pagination } from '../../utils/constants.js';
+import { PAGINATION } from '../utils/constants.js';
 
 const buildFilter = (query) => {
-  const filter = { isDeleted: false };
+  const filter = {};
 
   if (query.category) filter.category = query.category;
-  if (query.status) filter.status = query.status;
-  if (query.featured !== undefined) filter.featured = query.featured === 'true';
-  if (query.inStock === 'true') filter.stock = { $gt: 0 };
+  if (query.search) filter.$text = { $search: query.search };
+  if (query.inStock === 'true') filter.stockQuantity = { $gt: 0 };
 
   if (query.minPrice || query.maxPrice) {
     filter.retailPrice = {};
     if (query.minPrice) filter.retailPrice.$gte = parseFloat(query.minPrice);
     if (query.maxPrice) filter.retailPrice.$lte = parseFloat(query.maxPrice);
-  }
-
-  if (query.search) {
-    filter.$text = { $search: query.search };
   }
 
   return filter;
@@ -31,15 +26,14 @@ const findById = (id) => {
 };
 
 const findMany = (query) => {
-  const page = parseInt(query.page) || Pagination.DEFAULT_PAGE;
-  const limit = Math.min(parseInt(query.limit) || Pagination.DEFAULT_LIMIT, Pagination.MAX_LIMIT);
+  const page = parseInt(query.page) || PAGINATION.DEFAULT_PAGE;
+  const limit = Math.min(parseInt(query.limit) || PAGINATION.DEFAULT_LIMIT, PAGINATION.MAX_LIMIT);
   const skip = (page - 1) * limit;
   const sort = {};
 
   if (query.sort === 'price_asc') sort.retailPrice = 1;
   else if (query.sort === 'price_desc') sort.retailPrice = -1;
   else if (query.sort === 'newest') sort.createdAt = -1;
-  else if (query.sort === 'featured') sort.featured = -1;
 
   if (query.search) sort.score = { $meta: 'textScore' };
 
@@ -60,26 +54,16 @@ const findByIdAndUpdate = (id, updateData, options = {}) => {
   return Product.findByIdAndUpdate(id, updateData, { new: true, ...options });
 };
 
-const softDelete = (id) => {
-  return Product.findByIdAndUpdate(
-    id,
-    { isDeleted: true, deletedAt: new Date() },
-    { new: true }
-  );
+const deleteProduct = (id) => {
+  return Product.findByIdAndDelete(id);
 };
 
 const updateStock = (id, stock) => {
-  return Product.findByIdAndUpdate(id, { stock }, { new: true });
+  return Product.findByIdAndUpdate(id, { stockQuantity: stock }, { new: true });
 };
 
 const updatePricing = (id, retailPrice, wholesalePrice) => {
   return Product.findByIdAndUpdate(id, { retailPrice, wholesalePrice }, { new: true });
-};
-
-const removeImage = (id, imageIndex) => {
-  const update = { $unset: {} };
-  update.$unset[`images.${imageIndex}`] = 1;
-  return Product.findByIdAndUpdate(id, update, { new: true });
 };
 
 export {
@@ -88,8 +72,7 @@ export {
   findMany,
   countDocuments,
   findByIdAndUpdate,
-  softDelete,
+  deleteProduct,
   updateStock,
   updatePricing,
-  removeImage,
 };

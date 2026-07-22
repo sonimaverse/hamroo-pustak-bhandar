@@ -1,5 +1,4 @@
 import { asyncHandler } from '../utils/asyncHandler.js';
-import { ApiError } from '../utils/apiError.js';
 import ApiResponse from '../utils/apiResponse.js';
 import { register, login, refresh, logout, getProfile } from '../services/auth.service.js';
 

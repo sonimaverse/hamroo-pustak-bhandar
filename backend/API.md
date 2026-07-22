@@ -222,7 +222,7 @@ GET /api/v1/products?page=1&limit=12&category=Fiction&sort=price_asc&search=gats
         "status": "active"
       }
     ],
-    "pagination": {
+    "PAGINATION.DEFAULT_PAGE": {
       "currentPage": 1,
       "totalPages": 5,
       "totalItems": 60,

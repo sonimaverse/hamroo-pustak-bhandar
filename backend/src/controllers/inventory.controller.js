@@ -1,6 +1,6 @@
-import { asyncHandler } from '../../utils/asyncHandler.js';
-import { ApiError } from '../../utils/apiError.js';
-import ApiResponse from '../../utils/apiResponse.js';
+import { asyncHandler } from '../utils/asyncHandler.js';
+import ApiResponse from '../utils/apiResponse.js';
+
 import {
   addStock,
   removeStock,
@@ -8,7 +8,6 @@ import {
   getStockHistory,
   getLowStockProducts,
 } from '../services/inventory.service.js';
-
 const add = asyncHandler(async (req, res) => {
   const result = await addStock(
     req.params.productId,

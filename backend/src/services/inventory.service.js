@@ -1,4 +1,5 @@
-import { ApiError } from '../../utils/apiError.js';
+import { ApiError } from '../utils/apiError.js';
+
 import {
   findById,
   findLowStockProducts,
@@ -9,26 +10,39 @@ import {
   countHistoryByProduct,
 } from '../repositories/inventory.repository.js';
 
+
 const computeChange = (previous, next) => next - previous;
 
+
+// ADD STOCK
 const addStock = async (productId, quantity, reason, userId) => {
   if (quantity <= 0) {
     throw new ApiError('Quantity must be greater than 0', 400);
   }
 
   const product = await findById(productId);
+
   if (!product) {
     throw new ApiError('Product not found', 404);
   }
+
   if (product.isDeleted) {
     throw new ApiError('Product has been deleted', 404);
   }
 
   const previousQuantity = product.stock;
   const newQuantity = previousQuantity + quantity;
-  const changeAmount = computeChange(previousQuantity, newQuantity);
 
-  const updatedProduct = await updateProductStock(productId, newQuantity);
+  const changeAmount = computeChange(
+    previousQuantity,
+    newQuantity
+  );
+
+  const updatedProduct = await updateProductStock(
+    productId,
+    newQuantity
+  );
+
   await createStockHistory({
     product: productId,
     previousQuantity,
@@ -50,17 +64,17 @@ const addStock = async (productId, quantity, reason, userId) => {
   };
 };
 
+
+// REMOVE STOCK
 const removeStock = async (productId, quantity, reason, userId) => {
   if (quantity <= 0) {
     throw new ApiError('Quantity must be greater than 0', 400);
   }
 
   const product = await findById(productId);
+
   if (!product) {
     throw new ApiError('Product not found', 404);
-  }
-  if (product.isDeleted) {
-    throw new ApiError('Product has been deleted', 404);
   }
 
   const previousQuantity = product.stock;
@@ -68,14 +82,21 @@ const removeStock = async (productId, quantity, reason, userId) => {
 
   if (newQuantity < 0) {
     throw new ApiError(
-      `Cannot remove ${quantity} units. Current stock is ${previousQuantity}.`,
+      `Cannot remove ${quantity} units. Current stock is ${previousQuantity}`,
       400
     );
   }
 
-  const changeAmount = computeChange(previousQuantity, newQuantity);
+  const changeAmount = computeChange(
+    previousQuantity,
+    newQuantity
+  );
 
-  const updatedProduct = await updateProductStock(productId, newQuantity);
+  const updatedProduct = await updateProductStock(
+    productId,
+    newQuantity
+  );
+
   await createStockHistory({
     product: productId,
     previousQuantity,
@@ -85,6 +106,7 @@ const removeStock = async (productId, quantity, reason, userId) => {
     reason: reason || 'Stock removed by admin',
     performedBy: userId,
   });
+
 
   return {
     product: updatedProduct,
@@ -97,96 +119,153 @@ const removeStock = async (productId, quantity, reason, userId) => {
   };
 };
 
+
+// UPDATE STOCK
 const updateStock = async (productId, newStock, reason, userId) => {
+
   if (newStock < 0) {
-    throw new ApiError('Stock cannot be negative', 400);
+    throw new ApiError('Stock cannot be negative',400);
   }
+
 
   const product = await findById(productId);
+
   if (!product) {
-    throw new ApiError('Product not found', 404);
+    throw new ApiError('Product not found',404);
   }
-  if (product.isDeleted) {
-    throw new ApiError('Product has been deleted', 404);
-  }
+
 
   const previousQuantity = product.stock;
-  const changeAmount = computeChange(previousQuantity, newStock);
 
-  const updatedProduct = await updateProductStock(productId, newStock);
+  const changeAmount = computeChange(
+    previousQuantity,
+    newStock
+  );
+
+
+  const updatedProduct = await updateProductStock(
+    productId,
+    newStock
+  );
+
+
   await createStockHistory({
     product: productId,
     previousQuantity,
-    newQuantity: newStock,
+    newQuantity:newStock,
     changeAmount,
-    actionType: 'update',
+    actionType:'update',
     reason: reason || 'Stock updated by admin',
-    performedBy: userId,
+    performedBy:userId,
   });
 
+
+
   return {
-    product: updatedProduct,
-    history: {
+    product:updatedProduct,
+    history:{
       previousQuantity,
-      newQuantity: newStock,
+      newQuantity:newStock,
       changeAmount,
-      actionType: 'update',
-    },
+      actionType:'update'
+    }
   };
+
 };
 
-const getStockHistory = async (productId, { page = 1, limit = 20 } = {}) => {
+
+
+// STOCK HISTORY
+const getStockHistory = async (
+  productId,
+  {page = 1, limit = 20} = {}
+)=>{
+
   const product = await findById(productId);
-  if (!product) {
-    throw new ApiError('Product not found', 404);
+
+
+  if(!product){
+    throw new ApiError('Product not found',404);
   }
 
-  const [history, total] = await Promise.all([
-    findHistoryByProduct(productId, { page, limit }),
-    countHistoryByProduct(productId),
+
+  const [history,total] = await Promise.all([
+    findHistoryByProduct(productId,{page,limit}),
+    countHistoryByProduct(productId)
   ]);
+
 
   const totalPages = Math.ceil(total / limit);
 
+
   return {
+
     history,
-    productInfo: {
-      id: product._id,
-      title: product.title,
-      currentStock: product.stock,
-      minimumStock: product.minimumStock,
+
+    productInfo:{
+      id:product._id,
+      title:product.title,
+      currentStock:product.stock,
+      minimumStock:product.minimumStock
     },
-    pagination: {
-      currentPage: page,
+
+
+    pagination:{
+      currentPage:page,
       totalPages,
-      totalItems: total,
-      itemsPerPage: limit,
-    },
+      totalItems:total,
+      itemsPerPage:limit
+    }
+
   };
+
 };
 
-const getLowStockProducts = async (query = {}) => {
-  const page = parseInt(query.page) || 1;
-  const limit = Math.min(parseInt(query.limit) || 10, 50);
-  const skip = (page - 1) * limit;
 
-  const [products, total] = await Promise.all([
-    findLowStockProducts({ ...query, page, limit }),
-    countLowStockProducts(query),
+
+// LOW STOCK PRODUCTS
+const getLowStockProducts = async(query={})=>{
+
+  const page = parseInt(query.page) || 1;
+
+  const limit = Math.min(
+    parseInt(query.limit)||10,
+    50
+  );
+
+
+  const [products,total] = await Promise.all([
+
+    findLowStockProducts({
+      ...query,
+      page,
+      limit
+    }),
+
+    countLowStockProducts(query)
+
   ]);
+
 
   const totalPages = Math.ceil(total / limit);
 
+
   return {
+
     products,
-    pagination: {
-      currentPage: page,
+
+    pagination:{
+      currentPage:page,
       totalPages,
-      totalItems: total,
-      itemsPerPage: limit,
-    },
+      totalItems:total,
+      itemsPerPage:limit
+    }
+
   };
+
 };
+
+
 
 export {
   addStock,

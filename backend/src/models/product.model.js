@@ -1,40 +1,18 @@
 import mongoose from 'mongoose';
-import generateSequence from '../services/counter.service.js';
-import { PRODUCT_STATUS, ALLOWED_CATEGORIES } from '../utils/constants.js';
+import { ALLOWED_CATEGORIES } from '../utils/constants.js';
 
 const productSchema = new mongoose.Schema(
   {
-    sku: {
+    name: {
       type: String,
-      unique: true,
-      index: true,
-      immutable: true,
-    },
-    title: {
-      type: String,
-      required: [true, 'Product title is required'],
+      required: [true, 'Product name is required'],
       trim: true,
-      maxlength: [200, 'Title cannot exceed 200 characters'],
+      maxlength: [200, 'Name cannot exceed 200 characters'],
     },
-    slug: {
-      type: String,
-      unique: true,
-      index: true,
-      trim: true,
-    },
-    isbn: {
+    description: {
       type: String,
       trim: true,
-      index: true,
-    },
-    author: {
-      type: String,
-      trim: true,
-      index: true,
-    },
-    publisher: {
-      type: String,
-      trim: true,
+      maxlength: [2000, 'Description cannot exceed 2000 characters'],
     },
     category: {
       type: String,
@@ -42,10 +20,9 @@ const productSchema = new mongoose.Schema(
       enum: ALLOWED_CATEGORIES,
       index: true,
     },
-    description: {
+    image: {
       type: String,
-      trim: true,
-      maxlength: [2000, 'Description cannot exceed 2000 characters'],
+      required: [true, 'Image URL is required'],
     },
     retailPrice: {
       type: Number,
@@ -63,55 +40,17 @@ const productSchema = new mongoose.Schema(
         message: 'Wholesale price cannot exceed retail price',
       },
     },
-    stock: {
+    stockQuantity: {
       type: Number,
-      required: [true, 'Stock is required'],
-      min: [0, 'Stock cannot be negative'],
+      required: [true, 'Stock quantity is required'],
+      min: [0, 'Stock quantity cannot be negative'],
       default: 0,
-    },
-    minimumStock: {
-      type: Number,
-      required: [true, 'Minimum stock is required'],
-      min: [0, 'Minimum stock cannot be negative'],
-      default: 0,
-    },
-    featured: {
-      type: Boolean,
-      default: false,
       index: true,
-    },
-    status: {
-      type: String,
-      enum: Object.values(PRODUCT_STATUS),
-      default: PRODUCT_STATUS.ACTIVE,
-      index: true,
-    },
-    coverImage: {
-      type: String,
-      required: [true, 'Cover image URL is required'],
-    },
-    images: {
-      type: [String],
-      default: [],
     },
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
       required: true,
-    },
-    updatedBy: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-    },
-    isDeleted: {
-      type: Boolean,
-      default: false,
-      index: true,
-    },
-    deletedAt: {
-      type: Date,
-      default: null,
     },
   },
   {
@@ -121,34 +60,6 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-productSchema.index({ title: 'text', author: 'text', description: 'text' });
-
-productSchema.virtual('isLowStock').get(function () {
-  return this.stock <= this.minimumStock;
-});
-
-productSchema.pre('validate', async function (next) {
-  if (this.isNew && !this.sku) {
-    try {
-      this.sku = await generateSequence('product', { prefix: 'SKU', padding: 8 });
-    } catch (error) {
-      return next(new Error(`Failed to generate SKU: ${error.message}`));
-    }
-  }
-
-  if (!this.slug && this.title) {
-    const baseSlug = this.title
-      .toLowerCase()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/\s+/g, '-')
-      .replace(/-+/g, '-')
-      .trim();
-
-    const randomSuffix = Math.random().toString(36).substring(2, 8);
-    this.slug = `${baseSlug}-${randomSuffix}`;
-  }
-
-  next();
-});
+productSchema.index({ name: 'text', description: 'text' });
 
 export default mongoose.model('Product', productSchema);

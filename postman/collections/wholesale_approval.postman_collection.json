@@ -1,0 +1,321 @@
+{
+  "info": {
+    "name": "Wholesale Approval Module",
+    "description": "Collection of API endpoints for the Production Wholesale Approval Module.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "User APIs",
+      "item": [
+        {
+          "name": "Submit Wholesale Application",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"businessName\": \"Kathmandu Book Gallery\",\n  \"panVatNumber\": \"609823471\",\n  \"address\": \"New Road, Kathmandu, Nepal\",\n  \"phone\": \"+9779851012345\",\n  \"documents\": [\n    {\n      \"type\": \"business_registration\",\n      \"fileName\": \"registration_cert.pdf\",\n      \"url\": \"https://res.cloudinary.com/demo/image/upload/v123456/docs/registration_cert.pdf\",\n      \"publicId\": \"docs/registration_cert\"\n    },\n    {\n      \"type\": \"pan_vat_certificate\",\n      \"fileName\": \"pan_cert.pdf\",\n      \"url\": \"https://res.cloudinary.com/demo/image/upload/v123456/docs/pan_cert.pdf\",\n      \"publicId\": \"docs/pan_cert\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wholesale/apply",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wholesale",
+                "apply"
+              ]
+            },
+            "description": "Submit a new wholesale application. Transitions user status to pending and role to wholesale_pending. Fails if user already approved or has a pending request."
+          },
+          "response": []
+        },
+        {
+          "name": "Get My Application Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wholesale/my-application",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wholesale",
+                "my-application"
+              ]
+            },
+            "description": "Fetch details of the currently logged-in user's wholesale application. Excludes password and refreshToken."
+          },
+          "response": []
+        },
+        {
+          "name": "Update / Resubmit Application",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{accessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"businessName\": \"Kathmandu Book Gallery Updated\",\n  \"panVatNumber\": \"609823471\",\n  \"address\": \"Putalisadak, Kathmandu, Nepal\",\n  \"phone\": \"+9779851012345\",\n  \"documents\": [\n    {\n      \"type\": \"business_registration\",\n      \"fileName\": \"registration_cert_v2.pdf\",\n      \"url\": \"https://res.cloudinary.com/demo/image/upload/v123456/docs/registration_cert_v2.pdf\",\n      \"publicId\": \"docs/registration_cert_v2\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wholesale/my-application",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wholesale",
+                "my-application"
+              ]
+            },
+            "description": "Update application details. If user was previously rejected, this resets their role to wholesale_pending, status to pending, and clears the rejectionReason."
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Admin APIs",
+      "item": [
+        {
+          "name": "List Pending Applications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wholesale/pending?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wholesale",
+                "pending"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Retrieve a paginated list of pending wholesale applications. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "List Approved Applications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wholesale/approved?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wholesale",
+                "approved"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Retrieve a paginated list of approved wholesale users. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "List Rejected Applications",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wholesale/rejected?page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wholesale",
+                "rejected"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            },
+            "description": "Retrieve a paginated list of rejected wholesale applications. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Application Details By User ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wholesale/{{targetUserId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wholesale",
+                "{{targetUserId}}"
+              ]
+            },
+            "description": "Retrieve detailed wholesale application by User ID. Admins can view any user; regular users can only view their own."
+          },
+          "response": []
+        },
+        {
+          "name": "Approve Wholesale Application",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}",
+                "type": "text"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wholesale/{{targetUserId}}/approve",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wholesale",
+                "{{targetUserId}}",
+                "approve"
+              ]
+            },
+            "description": "Approve wholesale application. Changes role to wholesale_approved, status to approved, unsets rejectionReason. Fails if user is not in pending status. Admin only."
+          },
+          "response": []
+        },
+        {
+          "name": "Reject Wholesale Application",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{adminAccessToken}}",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Invalid PAN/VAT number registration. The number provided is unregistered in IRD database.\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/v1/wholesale/{{targetUserId}}/reject",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "v1",
+                "wholesale",
+                "{{targetUserId}}",
+                "reject"
+              ]
+            },
+            "description": "Reject wholesale application. Changes role to guest, status to rejected, and sets rejectionReason. Fails if user is not in pending status. Admin only."
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}

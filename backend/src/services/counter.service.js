@@ -8,9 +8,14 @@ const generateSequence = async (name, options = {}) => {
     $inc: { sequence_value: 1 },
     $setOnInsert: { prefix, padding },
   };
-  const options = { new: true, upsert: true };
 
-  const counter = await Counter.findOneAndUpdate(filter, update, options);
+  const mongooseOptions = { new: true, upsert: true };
+
+  const counter = await Counter.findOneAndUpdate(
+    filter,
+    update,
+    mongooseOptions
+  );
 
   if (!counter) {
     throw new Error(`Failed to generate sequence: ${name}`);
