@@ -1,0 +1,43 @@
+{
+  "name": "hamro-pustak-bhandar-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Production-ready wholesale bookstore management system backend",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "nodemon src/server.js",
+    "lint": "eslint src/",
+    "test": "node tests/integration/health.test.js",
+    "test:auth": "node tests/integration/auth.test.js",
+    "test:products": "node tests/integration/products.test.js",
+    "test:security": "node tests/integration/security.test.js",
+    "test:all": "node tests/integration/health.test.js && node tests/integration/auth.test.js && node tests/integration/products.test.js && node tests/integration/security.test.js"
+  },
+  "keywords": ["bookstore", "wholesale", "e-commerce", "api"],
+  "author": "Hamro Pustak Bhandar",
+  "license": "MIT",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cloudinary": "^1.41.3",
+    "cookie-parser": "^1.4.6",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.21.1",
+    "express-mongo-sanitize": "^2.2.0",
+    "express-rate-limit": "^7.4.0",
+    "helmet": "^8.0.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.8.2",
+    "multer": "^1.4.5-lts.1",
+    "pino": "^9.5.0",
+    "pino-http": "^9.0.0",
+    "xss": "^1.0.14",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "eslint": "^9.15.0",
+    "nodemon": "^3.1.7",
+    "pino-pretty": "^13.0.0"
+  }
+}
