@@ -1,0 +1,49 @@
+$kind: http-request
+name: Apply for Wholesale
+method: POST
+url: '{{baseUrl}}/wholesale/apply'
+order: 1000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{accessToken}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "businessName": "Pokharel Books Pvt Ltd",
+      "panVatNumber": "PAN123456789",
+      "address": "Kathmandu, Bagmati Province, Nepal",
+      "phone": "+9779800000001",
+      "documents": [
+        {
+          "type": "business_registration",
+          "fileName": "business_reg.pdf",
+          "url": "https://res.cloudinary.com/demo/image/upload/sample.pdf",
+          "publicId": "sample_business_reg"
+        },
+        {
+          "type": "pan_vat_certificate",
+          "fileName": "pan_cert.pdf",
+          "url": "https://res.cloudinary.com/demo/image/upload/sample2.pdf",
+          "publicId": "sample_pan_cert"
+        }
+      ]
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 201", function () {
+        pm.response.to.have.status(201);
+      });
+      pm.test("Response has data.application", function () {
+        var json = pm.response.json();
+        pm.expect(json.data).to.have.property("application");
+      });
+      var json = pm.response.json();
+      pm.environment.set("wholesaleAppId", json.data.application._id);

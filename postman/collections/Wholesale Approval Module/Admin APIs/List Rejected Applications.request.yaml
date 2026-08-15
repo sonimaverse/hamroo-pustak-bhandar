@@ -1,0 +1,10 @@
+$kind: http-request
+description: Retrieve a paginated list of rejected wholesale applications. Admin only.
+url: "{{baseUrl}}/api/v1/wholesale/rejected?page=1&limit=10"
+method: GET
+headers:
+  Authorization: Bearer {{adminAccessToken}}
+queryParams:
+  page: "1"
+  limit: "10"
+order: 3000

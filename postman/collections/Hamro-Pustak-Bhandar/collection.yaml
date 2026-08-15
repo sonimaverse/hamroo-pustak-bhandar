@@ -1,0 +1,8 @@
+$kind: collection
+name: Hamro Pustak Bhandar
+description: 'Complete API collection for Hamro Pustak Bhandar bookstore backend. Covers Auth, Products, Inventory, Wholesale, and Dashboard modules.'
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{accessToken}}'

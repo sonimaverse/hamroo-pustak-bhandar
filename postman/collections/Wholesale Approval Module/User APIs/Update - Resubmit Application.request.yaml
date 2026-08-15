@@ -1,0 +1,26 @@
+$kind: http-request
+name: Update / Resubmit Application
+description: Update application details. If user was previously rejected, this resets their role to wholesale_pending, status to pending, and clears the rejectionReason.
+url: "{{baseUrl}}/api/v1/wholesale/my-application"
+method: PUT
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{accessToken}}
+body:
+  type: text
+  content: |-
+    {
+      "businessName": "Kathmandu Book Gallery Updated",
+      "panVatNumber": "609823471",
+      "address": "Putalisadak, Kathmandu, Nepal",
+      "phone": "+9779851012345",
+      "documents": [
+        {
+          "type": "business_registration",
+          "fileName": "registration_cert_v2.pdf",
+          "url": "https://res.cloudinary.com/demo/image/upload/v123456/docs/registration_cert_v2.pdf",
+          "publicId": "docs/registration_cert_v2"
+        }
+      ]
+    }
+order: 3000

@@ -1,0 +1,14 @@
+$kind: http-request
+description: Reject wholesale application. Changes role to guest, status to rejected, and sets rejectionReason. Fails if user is not in pending status. Admin only.
+url: "{{baseUrl}}/api/v1/wholesale/{{targetUserId}}/reject"
+method: PATCH
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{adminAccessToken}}
+body:
+  type: text
+  content: |-
+    {
+      "reason": "Invalid PAN/VAT number registration. The number provided is unregistered in IRD database."
+    }
+order: 6000

@@ -1,0 +1,31 @@
+$kind: http-request
+name: 'Approve Application (Admin)'
+method: PATCH
+url: '{{baseUrl}}/wholesale/{{wholesaleAppId}}/approve'
+order: 8000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{adminToken}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response success is true", function () {
+        var json = pm.response.json();
+        pm.expect(json.success).to.be.true;
+      });
+      pm.test("Application status is approved", function () {
+        var json = pm.response.json();
+        pm.expect(json.data.application.status).to.equal("approved");
+      });
+      pm.test("User role is wholesale_approved", function () {
+        var json = pm.response.json();
+        if (json.data.application.user) {
+          pm.expect(json.data.application.user.role).to.equal("wholesale_approved");
+        }
+      });

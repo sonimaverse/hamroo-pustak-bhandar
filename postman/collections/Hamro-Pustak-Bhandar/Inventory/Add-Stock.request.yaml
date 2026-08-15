@@ -1,0 +1,35 @@
+$kind: http-request
+name: Add Stock
+method: PATCH
+url: '{{baseUrl}}/inventory/{{productId}}/add'
+order: 1000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{adminToken}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "quantity": 20,
+      "reason": "New stock received from supplier"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response success is true", function () {
+        var json = pm.response.json();
+        pm.expect(json.success).to.be.true;
+      });
+      pm.test("Stock was increased", function () {
+        var json = pm.response.json();
+        pm.expect(json.data).to.exist;
+      });

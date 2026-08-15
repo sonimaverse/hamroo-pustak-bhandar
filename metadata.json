@@ -1,0 +1,6 @@
+{
+  "name": "Hamro Pustak Bhandar",
+  "description": "Production-ready full-stack e-commerce and wholesale bookstore web platform.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

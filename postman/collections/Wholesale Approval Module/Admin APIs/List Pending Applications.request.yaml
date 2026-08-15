@@ -1,0 +1,10 @@
+$kind: http-request
+description: Retrieve a paginated list of pending wholesale applications. Admin only.
+url: "{{baseUrl}}/api/v1/wholesale/pending?page=1&limit=10"
+method: GET
+headers:
+  Authorization: Bearer {{adminAccessToken}}
+queryParams:
+  page: "1"
+  limit: "10"
+order: 1000

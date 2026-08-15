@@ -1,0 +1,46 @@
+$kind: http-request
+name: Create Product (Admin)
+method: POST
+url: '{{baseUrl}}/products'
+order: 4000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{adminToken}}'
+body:
+  type: form-data
+  content:
+    - key: name
+      value: 'The Great Gatsby'
+      type: text
+    - key: description
+      value: 'A classic American novel by F. Scott Fitzgerald'
+      type: text
+    - key: category
+      value: 'Fiction'
+      type: text
+    - key: retailPrice
+      value: '599'
+      type: text
+    - key: wholesalePrice
+      value: '450'
+      type: text
+    - key: stockQuantity
+      value: '50'
+      type: text
+    - key: image
+      type: file
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 201", function () {
+        pm.response.to.have.status(201);
+      });
+      pm.test("Response has data.product", function () {
+        var json = pm.response.json();
+        pm.expect(json.data).to.have.property("product");
+      });
+      var json = pm.response.json();
+      pm.environment.set("productId", json.data.product._id);

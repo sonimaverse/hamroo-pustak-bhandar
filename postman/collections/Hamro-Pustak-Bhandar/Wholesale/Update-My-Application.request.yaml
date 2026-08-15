@@ -1,0 +1,45 @@
+$kind: http-request
+name: Update My Application
+method: PUT
+url: '{{baseUrl}}/wholesale/my-application'
+order: 3000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{accessToken}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "businessName": "Pokharel Books & Stationery Pvt Ltd",
+      "panVatNumber": "PAN123456789",
+      "address": "Lalitpur, Bagmati Province, Nepal",
+      "phone": "+9779800000001",
+      "documents": [
+        {
+          "type": "business_registration",
+          "fileName": "business_reg_updated.pdf",
+          "url": "https://res.cloudinary.com/demo/image/upload/sample.pdf",
+          "publicId": "sample_business_reg_v2"
+        }
+      ]
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response success is true", function () {
+        var json = pm.response.json();
+        pm.expect(json.success).to.be.true;
+      });
+      pm.test("Application is updated", function () {
+        var json = pm.response.json();
+        pm.expect(json.data).to.have.property("application");
+      });
