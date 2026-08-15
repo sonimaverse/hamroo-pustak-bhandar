@@ -1,0 +1,7 @@
+$kind: http-request
+description: Fetch details of the currently logged-in user's wholesale application. Excludes password and refreshToken.
+url: "{{baseUrl}}/api/v1/wholesale/my-application"
+method: GET
+headers:
+  Authorization: Bearer {{accessToken}}
+order: 2000

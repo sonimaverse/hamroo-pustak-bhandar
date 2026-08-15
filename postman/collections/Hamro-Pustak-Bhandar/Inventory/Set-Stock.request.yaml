@@ -1,0 +1,31 @@
+$kind: http-request
+name: 'Set Stock (Absolute)'
+method: PATCH
+url: '{{baseUrl}}/inventory/{{productId}}/set'
+order: 3000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{adminToken}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "stock": 100,
+      "reason": "Physical stock count correction"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response success is true", function () {
+        var json = pm.response.json();
+        pm.expect(json.success).to.be.true;
+      });

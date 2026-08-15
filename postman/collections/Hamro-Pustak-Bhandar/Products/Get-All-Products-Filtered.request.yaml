@@ -1,0 +1,39 @@
+$kind: http-request
+name: 'Get All Products (Filtered)'
+method: GET
+url: '{{baseUrl}}/products'
+order: 3000
+queryParams:
+  - key: page
+    value: '1'
+  - key: limit
+    value: '5'
+  - key: category
+    value: Fiction
+  - key: sort
+    value: '-createdAt'
+  - key: inStock
+    value: 'true'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response success is true", function () {
+        var json = pm.response.json();
+        pm.expect(json.success).to.be.true;
+      });
+      pm.test("All products are in Fiction category", function () {
+        var json = pm.response.json();
+        json.data.products.forEach(function(p) {
+          pm.expect(p.category).to.equal("Fiction");
+        });
+      });
+      pm.test("All products are in stock", function () {
+        var json = pm.response.json();
+        json.data.products.forEach(function(p) {
+          pm.expect(p.stockQuantity).to.be.above(0);
+        });
+      });

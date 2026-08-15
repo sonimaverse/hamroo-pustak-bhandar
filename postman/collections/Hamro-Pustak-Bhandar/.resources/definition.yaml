@@ -1,0 +1,5 @@
+$kind: collection
+name: Hamro Pustak Bhandar API
+variables:
+  - key: baseUrl
+    value: 'http://localhost:5000/api/v1'

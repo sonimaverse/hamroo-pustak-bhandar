@@ -1,0 +1,26 @@
+$kind: http-request
+name: Product Stats
+method: GET
+url: '{{baseUrl}}/dashboard/products/stats'
+order: 2000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{adminToken}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response success is true", function () {
+        var json = pm.response.json();
+        pm.expect(json.success).to.be.true;
+      });
+      pm.test("Response has product stats", function () {
+        var json = pm.response.json();
+        pm.expect(json.data).to.have.property("activeProducts");
+        pm.expect(json.data).to.have.property("categoryDistribution");
+      });

@@ -1,0 +1,47 @@
+$kind: http-request
+name: 'Update Product (Admin)'
+method: PUT
+url: '{{baseUrl}}/products/{{productId}}'
+order: 5000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{adminToken}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "name": "The Great Gatsby - Special Edition",
+      "description": "Updated edition with new foreword by a literary scholar",
+      "category": "Fiction",
+      "retailPrice": 649,
+      "wholesalePrice": 480
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response success is true", function () {
+        var json = pm.response.json();
+        pm.expect(json.success).to.be.true;
+      });
+      pm.test("Response has updated product", function () {
+        var json = pm.response.json();
+        pm.expect(json.data).to.have.property("product");
+      });
+      pm.test("Product name is updated", function () {
+        var json = pm.response.json();
+        pm.expect(json.data.product.name).to.equal("The Great Gatsby - Special Edition");
+      });
+      pm.test("wholesalePrice does not exceed retailPrice", function () {
+        var json = pm.response.json();
+        var p = json.data.product;
+        pm.expect(p.wholesalePrice).to.be.at.most(p.retailPrice);
+      });

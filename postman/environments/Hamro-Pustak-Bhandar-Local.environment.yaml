@@ -1,0 +1,16 @@
+name: Hamro Pustak Bhandar - Local
+values:
+  - key: baseUrl
+    value: 'http://localhost:5000/api/v1'
+  - key: adminToken
+    value: ''
+  - key: userId
+    value: ''
+  - key: adminId
+    value: ''
+  - key: productId
+    value: ''
+  - key: wholesaleAppId
+    value: ''
+  - key: accessToken
+    value: ''

@@ -1,0 +1,7 @@
+$kind: http-request
+description: Approve wholesale application. Changes role to wholesale_approved, status to approved, unsets rejectionReason. Fails if user is not in pending status. Admin only.
+url: "{{baseUrl}}/api/v1/wholesale/{{targetUserId}}/approve"
+method: PATCH
+headers:
+  Authorization: Bearer {{adminAccessToken}}
+order: 5000

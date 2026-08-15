@@ -1,0 +1,39 @@
+$kind: http-request
+name: Admin Login
+method: POST
+url: '{{baseUrl}}/auth/login'
+order: 3000
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "email": "admin1@gmail.com",
+      "password": "Admin12345"
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response success is true", function () {
+        var json = pm.response.json();
+        pm.expect(json.success).to.be.true;
+      });
+      pm.test("User role is admin", function () {
+        var json = pm.response.json();
+        pm.expect(json.data.user.role).to.equal("admin");
+      });
+      pm.test("refreshToken cookie is set", function () {
+        pm.expect(pm.cookies.has("refreshToken")).to.be.true;
+      });
+      var json = pm.response.json();
+      if (json.data && json.data.accessToken) {
+        pm.environment.set("adminToken", json.data.accessToken);
+        pm.environment.set("adminId", json.data.user._id);
+        console.log("Admin token saved");
+      }

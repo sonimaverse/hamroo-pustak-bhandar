@@ -1,0 +1,38 @@
+$kind: http-request
+name: Get Profile
+method: GET
+url: '{{baseUrl}}/auth/profile'
+order: 5000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{accessToken}}'
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response success is true", function () {
+        var json = pm.response.json();
+        pm.expect(json.success).to.be.true;
+      });
+      pm.test("Response has user object", function () {
+        var json = pm.response.json();
+        pm.expect(json.data).to.have.property("user");
+      });
+      pm.test("User has required fields", function () {
+        var json = pm.response.json();
+        var user = json.data.user;
+        pm.expect(user).to.have.property("_id");
+        pm.expect(user).to.have.property("email");
+        pm.expect(user).to.have.property("fullName");
+        pm.expect(user).to.have.property("role");
+      });
+      pm.test("Password is not exposed", function () {
+        var json = pm.response.json();
+        pm.expect(json.data.user).to.not.have.property("password");
+        pm.expect(json.data.user).to.not.have.property("refreshToken");
+      });

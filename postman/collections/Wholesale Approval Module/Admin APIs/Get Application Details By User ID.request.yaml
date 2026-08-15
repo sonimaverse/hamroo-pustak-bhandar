@@ -1,0 +1,7 @@
+$kind: http-request
+description: Retrieve detailed wholesale application by User ID. Admins can view any user; regular users can only view their own.
+url: "{{baseUrl}}/api/v1/wholesale/{{targetUserId}}"
+method: GET
+headers:
+  Authorization: Bearer {{adminAccessToken}}
+order: 4000

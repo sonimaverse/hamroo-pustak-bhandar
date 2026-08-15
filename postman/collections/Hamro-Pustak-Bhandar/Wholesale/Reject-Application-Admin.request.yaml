@@ -1,0 +1,34 @@
+$kind: http-request
+name: 'Reject Application (Admin)'
+method: PATCH
+url: '{{baseUrl}}/wholesale/{{wholesaleAppId}}/reject'
+order: 9000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{adminToken}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "reason": "Incomplete documentation provided. Please resubmit with valid PAN/VAT certificate."
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response success is true", function () {
+        var json = pm.response.json();
+        pm.expect(json.success).to.be.true;
+      });
+      pm.test("Application status is rejected", function () {
+        var json = pm.response.json();
+        pm.expect(json.data.application.status).to.equal("rejected");
+      });

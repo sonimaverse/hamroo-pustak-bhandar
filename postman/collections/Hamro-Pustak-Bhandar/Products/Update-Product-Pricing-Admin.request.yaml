@@ -1,0 +1,44 @@
+$kind: http-request
+name: 'Update Product Pricing (Admin)'
+method: PATCH
+url: '{{baseUrl}}/products/{{productId}}/pricing'
+order: 7000
+auth:
+  type: bearer
+  credentials:
+    - key: token
+      value: '{{adminToken}}'
+headers:
+  - key: Content-Type
+    value: application/json
+body:
+  type: json
+  content: |-
+    {
+      "retailPrice": 699,
+      "wholesalePrice": 520
+    }
+scripts:
+  - type: afterResponse
+    language: text/javascript
+    code: |-
+      pm.test("Status is 200", function () {
+        pm.response.to.have.status(200);
+      });
+      pm.test("Response success is true", function () {
+        var json = pm.response.json();
+        pm.expect(json.success).to.be.true;
+      });
+      pm.test("Retail price is updated", function () {
+        var json = pm.response.json();
+        pm.expect(json.data.product.retailPrice).to.equal(699);
+      });
+      pm.test("Wholesale price is updated", function () {
+        var json = pm.response.json();
+        pm.expect(json.data.product.wholesalePrice).to.equal(520);
+      });
+      pm.test("wholesalePrice does not exceed retailPrice", function () {
+        var json = pm.response.json();
+        var p = json.data.product;
+        pm.expect(p.wholesalePrice).to.be.at.most(p.retailPrice);
+      });

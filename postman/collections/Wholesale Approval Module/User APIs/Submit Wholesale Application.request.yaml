@@ -1,0 +1,31 @@
+$kind: http-request
+description: Submit a new wholesale application. Transitions user status to pending and role to wholesale_pending. Fails if user already approved or has a pending request.
+url: "{{baseUrl}}/api/v1/wholesale/apply"
+method: POST
+headers:
+  Content-Type: application/json
+  Authorization: Bearer {{accessToken}}
+body:
+  type: text
+  content: |-
+    {
+      "businessName": "Kathmandu Book Gallery",
+      "panVatNumber": "609823471",
+      "address": "New Road, Kathmandu, Nepal",
+      "phone": "+9779851012345",
+      "documents": [
+        {
+          "type": "business_registration",
+          "fileName": "registration_cert.pdf",
+          "url": "https://res.cloudinary.com/demo/image/upload/v123456/docs/registration_cert.pdf",
+          "publicId": "docs/registration_cert"
+        },
+        {
+          "type": "pan_vat_certificate",
+          "fileName": "pan_cert.pdf",
+          "url": "https://res.cloudinary.com/demo/image/upload/v123456/docs/pan_cert.pdf",
+          "publicId": "docs/pan_cert"
+        }
+      ]
+    }
+order: 1000
