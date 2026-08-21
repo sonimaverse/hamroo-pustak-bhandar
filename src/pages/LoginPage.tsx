@@ -121,6 +121,12 @@ export const LoginPage: React.FC = () => {
         </button>
       </form>
 
+      <div className="flex items-center justify-between text-xs">
+        <Link to="/forgot-password" className="font-bold text-red-700 hover:text-red-800">
+          Forgot Password?
+        </Link>
+      </div>
+
       <div className="text-center pt-4 border-t border-stone-100 text-xs text-stone-500">
         <span>Don't have an account yet? </span>
         <Link to="/register" state={location.state} className="font-bold text-red-700 hover:text-red-800">

@@ -17,6 +17,9 @@ import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import enquiryRoutes from './routes/enquiryRoutes.js';
 import quotationRoutes from './routes/quotationRoutes.js';
+import invoiceRoutes from './routes/invoiceRoutes.js';
+
+import { ApiError } from './utils/apiError.js';
 
 import { ApiError } from './utils/apiError.js';
 
@@ -77,6 +80,8 @@ export const createApp = (): Application => {
   app.use('/api/enquiries', enquiryRoutes);
 
   app.use('/api/quotations', quotationRoutes);
+
+  app.use('/api/invoices', invoiceRoutes);
 
   // =========================================================
   // UNKNOWN API ROUTES

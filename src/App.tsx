@@ -17,6 +17,8 @@ import { ShopPage } from './pages/ShopPage';
 import { BookDetailsPage } from './pages/BookDetailsPage';
 import { LoginPage } from './pages/LoginPage';
 import { RegisterPage } from './pages/RegisterPage';
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage';
+import { ResetPasswordPage } from './pages/ResetPasswordPage';
 
 // Customer pages
 import { CartPage } from './pages/CartPage';
@@ -43,6 +45,8 @@ import { AdminOrdersPage } from './pages/admin/AdminOrdersPage';
 import { AdminUsersPage } from './pages/admin/AdminUsersPage';
 import { AdminEnquiriesPage } from './pages/admin/AdminEnquiriesPage';
 import { AdminQuotationsPage } from './pages/admin/AdminQuotationsPage';
+import { AdminBillingPage } from './pages/admin/AdminBillingPage';
+import { InvoiceViewPage } from './pages/admin/InvoiceViewPage';
 
 // Other pages
 import { EnquiryPage } from './pages/EnquiryPage';
@@ -125,6 +129,16 @@ export function App() {
                 element={<RegisterPage />}
               />
 
+              <Route
+                path="forgot-password"
+                element={<ForgotPasswordPage />}
+              />
+
+              <Route
+                path="reset-password"
+                element={<ResetPasswordPage />}
+              />
+
 
               {/* =================================================
                   GUEST CHECKOUT
@@ -142,10 +156,18 @@ export function App() {
               />
 
               {/* Guest order details are also public because
-                  guest customers need to see their newly created order. */}
+                   guest customers need to see their newly created order. */}
               <Route
                 path="orders/:id"
                 element={<OrderDetailsPage />}
+              />
+
+              {/* Invoice view is public (owner or admin).
+                   Backend enforces ownership; guests without a token
+                   see 403 on private invoices. */}
+              <Route
+                path="invoices/:id"
+                element={<InvoiceViewPage />}
               />
 
 
@@ -263,6 +285,16 @@ export function App() {
                 <Route
                   path="quotations"
                   element={<AdminQuotationsPage />}
+                />
+
+                <Route
+                  path="billing"
+                  element={<AdminBillingPage />}
+                />
+
+                <Route
+                  path="invoices/:id"
+                  element={<InvoiceViewPage />}
                 />
 
                 <Route

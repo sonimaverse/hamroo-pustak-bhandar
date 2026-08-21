@@ -37,6 +37,52 @@ export class InvoiceService {
   }
 
   /**
+   * Normalize any payment-method variant to a single canonical display
+   * label. The original Order payment method is the source of truth; this
+   * guarantees the Invoice header and Payment History never disagree.
+   *
+   * Mappings:
+   *   bank_transfer / bank transfer / Bank Transfer         -> Bank Transfer
+   *   cod / cash_on_delivery / cash on delivery / COD       -> Cash on Delivery
+   *   online / online_payment / online payment / Online     -> Online Payment
+   */
+  private static normalizePaymentMethod(value?: string): string {
+    if (!value) {
+      return 'Cash on Delivery';
+    }
+
+    const v = value.trim().toLowerCase().replace(/[\s_-]+/g, '_');
+
+    switch (v) {
+      case 'bank_transfer':
+        return 'Bank Transfer';
+
+      case 'cod':
+      case 'cash_on_delivery':
+        return 'Cash on Delivery';
+
+      case 'online':
+      case 'online_payment':
+        return 'Online Payment';
+
+      default:
+        /*
+         * If it already matches one of the known canonical labels,
+         * keep it unchanged. Otherwise fall back to Cash on Delivery.
+         */
+        const canonical = [
+          'Cash on Delivery',
+          'Bank Transfer',
+          'Online Payment',
+          'COD',
+          'Online',
+        ];
+
+        return canonical.includes(value) ? value : 'Cash on Delivery';
+    }
+  }
+
+  /**
    * Recompute invoice totals and status after payment changes.
    */
   private static recomputeInvoice(invoice: any): void {
@@ -103,7 +149,7 @@ export class InvoiceService {
         total: subtotal - discount + tax,
         paidAmount: 0,
         status: 'issued',
-        paymentMethod: order.paymentMethod || 'Cash on Delivery',
+        paymentMethod: this.normalizePaymentMethod(order.paymentMethod),
         paymentScreenshot: order.paymentScreenshot || '',
         billingAddress: order.shippingAddress,
         notes: input.notes || '',
@@ -143,7 +189,7 @@ export class InvoiceService {
       total: subtotal - discount + tax,
       notes: input.notes || '',
       dueDate: input.dueDate,
-      paymentMethod: order.paymentMethod || 'Cash on Delivery',
+      paymentMethod: this.normalizePaymentMethod(order.paymentMethod),
       paymentScreenshot: order.paymentScreenshot || '',
       billingAddress: order.shippingAddress,
       createdBy: createdBy,
@@ -224,6 +270,69 @@ export class InvoiceService {
   }
 
   /**
+   * Get invoice by linked order ID.
+   * Accessible by admin or the order owner.
+   */
+  static async getInvoiceByOrderId(
+    orderId: string,
+    userId: string | null,
+    userRole: string
+  ): Promise<any> {
+    const dbState = getDbStatus();
+
+    if (dbState.mode === 'mongodb_atlas' && dbState.isConnected) {
+      const invoice = await Invoice.findOne({ orderId })
+        .populate('orderId')
+        .populate('userId', 'name email phone role wholesaleStatus');
+
+      if (!invoice) {
+        throw new ApiError(404, 'No invoice found for this order.');
+      }
+
+      const invoiceUserId =
+        invoice.userId && typeof invoice.userId === 'object' && '_id' in invoice.userId
+          ? (invoice.userId as any)._id.toString()
+          : invoice.userId
+            ? invoice.userId.toString()
+            : null;
+
+      if (
+        invoiceUserId &&
+        invoiceUserId !== userId &&
+        userRole !== 'admin'
+      ) {
+        throw new ApiError(403, 'You are not authorized to view this invoice.');
+      }
+
+      return invoice;
+    }
+
+    const order = fallbackStore.getOrderById(orderId);
+
+    if (!order) {
+      throw new ApiError(404, 'Order not found.');
+    }
+
+    const invoice = fallbackStore.getInvoiceByOrderId(orderId);
+
+    if (!invoice) {
+      throw new ApiError(404, 'No invoice found for this order.');
+    }
+
+    const invoiceUserId = invoice.userId;
+
+    if (
+      invoiceUserId &&
+      invoiceUserId !== userId &&
+      userRole !== 'admin'
+    ) {
+      throw new ApiError(403, 'You are not authorized to view this invoice.');
+    }
+
+    return invoice;
+  }
+
+  /**
    * Record a payment against an invoice.
    * Admin-only.
    * Syncs Order.paymentStatus when invoice is fully paid.
@@ -255,7 +364,7 @@ export class InvoiceService {
       (invoice as any).paymentRecords.push({
         _id: new mongoose.Types.ObjectId(),
         amount,
-        method: input.paymentMethod || 'Cash on Delivery',
+        method: this.normalizePaymentMethod(invoice.paymentMethod),
         screenshot: input.paymentScreenshot || '',
         notes: input.notes || '',
         date: new Date(),
@@ -299,7 +408,7 @@ export class InvoiceService {
     invoice.paymentRecords.push({
       _id: 'pay_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
       amount,
-      method: input.paymentMethod || 'Cash on Delivery',
+      method: this.normalizePaymentMethod(invoice.paymentMethod),
       screenshot: input.paymentScreenshot || '',
       notes: input.notes || '',
       date: new Date(),

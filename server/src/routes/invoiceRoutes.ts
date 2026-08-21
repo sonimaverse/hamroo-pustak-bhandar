@@ -4,6 +4,13 @@ import { optionalAuth } from '../middleware/authMiddleware.js';
 
 const router = Router();
 
+// Admin or order owner: View invoice by order ID
+router.get(
+  '/order/:orderId',
+  optionalAuth,
+  InvoiceController.getByOrderId
+);
+
 // Admin or order owner: View invoice by ID
 router.get(
   '/:id',

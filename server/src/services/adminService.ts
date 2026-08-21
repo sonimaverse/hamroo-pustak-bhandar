@@ -3,6 +3,7 @@ import { Book } from '../models/Book.js';
 import { Category } from '../models/Category.js';
 import { Order } from '../models/Order.js';
 import { WholesaleProfile } from '../models/WholesaleProfile.js';
+import { ApiError } from '../utils/apiError.js';
 import { getDbStatus } from '../config/db.js';
 import { fallbackStore } from './fallbackStore.js';
 
@@ -142,5 +143,95 @@ export class AdminService {
         limit,
       });
     }
+  }
+
+  /**
+   * Deactivate a user account. Preserves the user record and all associated
+   * historical data (Orders, Invoices, WholesaleProfile, Cart).
+   */
+  static async deactivateUser(userId: string) {
+    const dbState = getDbStatus();
+
+    if (dbState.mode === 'mongodb_atlas' && dbState.isConnected) {
+      const user = await User.findById(userId);
+
+      if (!user) {
+        throw new ApiError(404, 'User account not found.');
+      }
+
+      user.isActive = false;
+      await user.save();
+
+      return user.toSafeObject();
+    }
+
+    const user = fallbackStore.deactivateUser(userId);
+
+    if (!user) {
+      throw new ApiError(404, 'User account not found.');
+    }
+
+    return fallbackStore.toSafeObject(user);
+  }
+
+  /**
+   * Reactivate a previously deactivated user account.
+   */
+  static async reactivateUser(userId: string) {
+    const dbState = getDbStatus();
+
+    if (dbState.mode === 'mongodb_atlas' && dbState.isConnected) {
+      const user = await User.findById(userId);
+
+      if (!user) {
+        throw new ApiError(404, 'User account not found.');
+      }
+
+      user.isActive = true;
+      await user.save();
+
+      return user.toSafeObject();
+    }
+
+    const user = fallbackStore.reactivateUser(userId);
+
+    if (!user) {
+      throw new ApiError(404, 'User account not found.');
+    }
+
+    return fallbackStore.toSafeObject(user);
+  }
+
+  /**
+   * Revoke wholesale privileges from a user. Changes role to customer and
+   * wholesaleStatus to rejected. Keeps the account active and preserves all
+   * historical records.
+   */
+  static async revokeWholesale(userId: string) {
+    const dbState = getDbStatus();
+
+    if (dbState.mode === 'mongodb_atlas' && dbState.isConnected) {
+      const user = await User.findById(userId);
+
+      if (!user) {
+        throw new ApiError(404, 'User account not found.');
+      }
+
+      if (user.role === 'wholesale') {
+        user.role = 'customer';
+        user.wholesaleStatus = 'rejected';
+        await user.save();
+      }
+
+      return user.toSafeObject();
+    }
+
+    const user = fallbackStore.revokeWholesale(userId);
+
+    if (!user) {
+      throw new ApiError(404, 'User account not found.');
+    }
+
+    return fallbackStore.toSafeObject(user);
   }
 }

@@ -42,4 +42,55 @@ export class AdminController {
       next(error);
     }
   }
+
+  /**
+   * PUT /api/admin/users/:id/deactivate
+   * Deactivate a user account. Preserves all historical records.
+   */
+  static async deactivateUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const user = await AdminService.deactivateUser(id);
+
+      res.status(200).json(
+        new ApiResponse(200, { user }, 'User account deactivated.')
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * PUT /api/admin/users/:id/reactivate
+   * Reactivate a previously deactivated user account.
+   */
+  static async reactivateUser(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const user = await AdminService.reactivateUser(id);
+
+      res.status(200).json(
+        new ApiResponse(200, { user }, 'User account reactivated.')
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  /**
+   * PUT /api/admin/users/:id/revoke-wholesale
+   * Revoke wholesale privileges from a user. Keeps the account active.
+   */
+  static async revokeWholesale(req: AuthenticatedRequest, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { id } = req.params;
+      const user = await AdminService.revokeWholesale(id);
+
+      res.status(200).json(
+        new ApiResponse(200, { user }, 'Wholesale privileges revoked.')
+      );
+    } catch (error) {
+      next(error);
+    }
+  }
 }

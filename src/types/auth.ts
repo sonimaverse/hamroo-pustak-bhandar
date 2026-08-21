@@ -5,6 +5,7 @@ export interface User {
   phone?: string;
   role: 'customer' | 'wholesale' | 'admin';
   wholesaleStatus: 'none' | 'pending' | 'approved' | 'rejected';
+  isActive: boolean;
   address?: {
     street?: string;
     city?: string;

@@ -230,7 +230,7 @@ const InvoiceSchema = new Schema<IInvoice>(
   }
 );
 
-InvoiceSchema.pre('save', function (next) {
+InvoiceSchema.pre('save', function () {
   const total = this.total || 0;
   const paidAmount = this.paidAmount || 0;
   this.dueAmount = Math.max(total - paidAmount, 0);
@@ -242,8 +242,6 @@ InvoiceSchema.pre('save', function (next) {
   } else if (paidAmount === 0) {
     this.status = 'issued';
   }
-
-  next();
 });
 
 export const Invoice: Model<IInvoice> =

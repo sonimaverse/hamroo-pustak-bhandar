@@ -12,10 +12,12 @@ import {
   X,
   Maximize2,
   AlertCircle,
+  Receipt,
 } from 'lucide-react';
 
 import { Order } from '../../types/order';
 import { adminService } from '../../services/adminService';
+import { invoiceService } from '../../services/invoiceService';
 import { LoadingSpinner } from '../../components/common/LoadingSpinner';
 import { ErrorAlert } from '../../components/common/ErrorAlert';
 
@@ -33,6 +35,14 @@ export const AdminOrdersPage: React.FC = () => {
 
   const [updatingOrderId, setUpdatingOrderId] =
     useState<string | null>(null);
+
+  /*
+   * Track invoice generation in progress.
+   */
+  const [generatingInvoiceId, setGeneratingInvoiceId] =
+    useState<string | null>(null);
+
+  const [invoiceError, setInvoiceError] = useState<string | null>(null);
 
   /*
    * Currently opened payment screenshot.
@@ -186,6 +196,38 @@ export const AdminOrdersPage: React.FC = () => {
       );
     } finally {
       setUpdatingOrderId(null);
+    }
+  };
+
+  /* =========================================================
+      GENERATE INVOICE FROM ORDER
+   ========================================================= */
+
+  const handleGenerateInvoice = async (orderId: string) => {
+    try {
+      setGeneratingInvoiceId(orderId);
+      setInvoiceError(null);
+
+      const data = await invoiceService.generateFromOrder(orderId, {
+        discount: 0,
+        tax: 0,
+      });
+
+      await fetchOrders();
+
+      /*
+       * Open invoice view in a new tab/route.
+       */
+      window.open(`/admin/invoices/${data.invoice._id}`, '_blank');
+    } catch (err: any) {
+      console.error('Invoice generation failed:', err);
+
+      setInvoiceError(
+        err?.response?.data?.message ||
+          'Failed to generate invoice.'
+      );
+    } finally {
+      setGeneratingInvoiceId(null);
     }
   };
 
@@ -537,6 +579,15 @@ export const AdminOrdersPage: React.FC = () => {
           />
         )}
 
+        {invoiceError && (
+          <ErrorAlert
+            message={invoiceError}
+            onClose={() =>
+              setInvoiceError(null)
+            }
+          />
+        )}
+
         {/* =====================================================
             LOADING
         ====================================================== */}
@@ -643,6 +694,23 @@ export const AdminOrdersPage: React.FC = () => {
                       >
                         <Eye className="w-4 h-4" />
                       </Link>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          handleGenerateInvoice(
+                            ord._id
+                          )
+                        }
+                        disabled={
+                          generatingInvoiceId ===
+                          ord._id
+                        }
+                        className="p-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-xl transition disabled:opacity-50"
+                        title="Generate invoice"
+                      >
+                        <Receipt className="w-4 h-4" />
+                      </button>
 
                     </div>
 

@@ -17,6 +17,19 @@ export interface FallbackUser {
   };
   role: UserRole;
   wholesaleStatus: WholesaleStatus;
+
+  /*
+   * Password reset token (SHA-256 hash) and expiry.
+   */
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
+
+  /*
+   * Activation flag. Deactivated users cannot authenticate but all their
+   * historical records are preserved.
+   */
+  isActive: boolean;
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -170,6 +183,48 @@ export interface FallbackQuotation {
   updatedAt: Date;
 }
 
+export interface FallbackInvoiceItem {
+  bookId: string;
+  title: string;
+  quantity: number;
+  price: number;
+  subtotal: number;
+}
+
+export interface FallbackPaymentRecord {
+  _id: string;
+  amount: number;
+  method: string;
+  screenshot?: string;
+  notes?: string;
+  date: Date;
+}
+
+export interface FallbackInvoice {
+  _id: string;
+  invoiceNumber: string;
+  orderId: string;
+  userId?: string | null;
+  invoiceDate: Date;
+  dueDate?: Date;
+  items: FallbackInvoiceItem[];
+  subtotal: number;
+  discount: number;
+  tax: number;
+  total: number;
+  paidAmount: number;
+  dueAmount: number;
+  status: 'draft' | 'issued' | 'partially_paid' | 'paid' | 'cancelled';
+  paymentMethod: string;
+  paymentScreenshot?: string;
+  billingAddress?: Record<string, any>;
+  notes?: string;
+  paymentRecords?: FallbackPaymentRecord[];
+  createdBy?: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
 class FallbackStore {
   private users: FallbackUser[] = [];
   private categories: FallbackCategory[] = [];
@@ -179,6 +234,7 @@ class FallbackStore {
   private orders: FallbackOrder[] = [];
   private enquiries: FallbackEnquiry[] = [];
   private quotations: FallbackQuotation[] = [];
+  private invoices: FallbackInvoice[] = [];
 
   constructor() {
     this.seedDefaultUsers();
@@ -204,6 +260,7 @@ class FallbackStore {
         },
         role: 'customer',
         wholesaleStatus: 'none',
+        isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -222,6 +279,7 @@ class FallbackStore {
         },
         role: 'wholesale',
         wholesaleStatus: 'approved',
+        isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -240,6 +298,7 @@ class FallbackStore {
         },
         role: 'admin',
         wholesaleStatus: 'none',
+        isActive: true,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
@@ -544,12 +603,41 @@ class FallbackStore {
       },
       role: 'customer',
       wholesaleStatus: 'none',
+      isActive: true,
       createdAt: new Date(),
       updatedAt: new Date(),
     };
 
     this.users.push(newUser);
     return newUser;
+  }
+
+  // User activation helpers
+  public deactivateUser(userId: string): FallbackUser | undefined {
+    const user = this.findUserById(userId);
+    if (!user) return undefined;
+    user.isActive = false;
+    user.updatedAt = new Date();
+    return user;
+  }
+
+  public reactivateUser(userId: string): FallbackUser | undefined {
+    const user = this.findUserById(userId);
+    if (!user) return undefined;
+    user.isActive = true;
+    user.updatedAt = new Date();
+    return user;
+  }
+
+  public revokeWholesale(userId: string): FallbackUser | undefined {
+    const user = this.findUserById(userId);
+    if (!user) return undefined;
+    if (user.role === 'wholesale') {
+      user.role = 'customer';
+      user.wholesaleStatus = 'rejected';
+      user.updatedAt = new Date();
+    }
+    return user;
   }
 
   public updateUserProfile(
@@ -574,6 +662,46 @@ class FallbackStore {
   public toSafeObject(user: FallbackUser) {
     const { passwordHash, ...safeUser } = user;
     return safeUser;
+  }
+
+  // Password reset helpers
+  public setPasswordResetToken(
+    userId: string,
+    token: string,
+    expires: Date
+  ): void {
+    const user = this.findUserById(userId);
+    if (user) {
+      user.passwordResetToken = token;
+      user.passwordResetExpires = expires;
+      user.updatedAt = new Date();
+    }
+  }
+
+  public findUserByResetToken(hashedToken: string): FallbackUser | undefined {
+    return this.users.find(
+      (u) =>
+        u.passwordResetToken === hashedToken &&
+        u.passwordResetExpires !== undefined &&
+        u.passwordResetExpires > new Date()
+    );
+  }
+
+  public updateUserPassword(userId: string, newPasswordHash: string): void {
+    const user = this.findUserById(userId);
+    if (user) {
+      user.passwordHash = newPasswordHash;
+      user.updatedAt = new Date();
+    }
+  }
+
+  public clearPasswordResetToken(userId: string): void {
+    const user = this.findUserById(userId);
+    if (user) {
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      user.updatedAt = new Date();
+    }
   }
 
   public getAllUsersPaginated(params: {
@@ -883,6 +1011,74 @@ class FallbackStore {
 
   public getQuotationById(id: string): FallbackQuotation | undefined {
     return this.quotations.find((q) => q._id === id);
+  }
+
+  // Invoice Methods
+  public createInvoice(data: Omit<FallbackInvoice, '_id' | 'createdAt' | 'updatedAt' | 'invoiceNumber' | 'dueAmount' | 'status' | 'paymentRecords'>): FallbackInvoice {
+    const count = this.invoices.length + 1;
+    const invoiceNumber = `HPB-${count.toString().padStart(6, '0')}`;
+
+    const discount = Number(data.discount) || 0;
+    const tax = Number(data.tax) || 0;
+    const total = Number(data.subtotal) - discount + tax;
+    const paidAmount = Number((data as any).paidAmount) || 0;
+
+    let status: FallbackInvoice['status'] = 'issued';
+    if (paidAmount >= total && total > 0) {
+      status = 'paid';
+    } else if (paidAmount > 0) {
+      status = 'partially_paid';
+    }
+
+    const invoice: FallbackInvoice = {
+      ...data,
+      _id: 'inv_' + Date.now().toString(36) + Math.random().toString(36).substring(2, 5),
+      invoiceNumber,
+      dueAmount: Math.max(total - paidAmount, 0),
+      status,
+      paymentRecords: [],
+      createdAt: new Date(),
+      updatedAt: new Date(),
+    };
+
+    this.invoices.push(invoice);
+
+    return invoice;
+  }
+
+  public getAllInvoices(): FallbackInvoice[] {
+    return [...this.invoices].sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+
+  public getInvoiceById(id: string): FallbackInvoice | undefined {
+    return this.invoices.find((inv) => inv._id === id);
+  }
+
+  public getInvoiceByOrderId(orderId: string): FallbackInvoice | undefined {
+    return this.invoices.find((inv) => inv.orderId === orderId);
+  }
+
+  public updateInvoice(id: string, data: Partial<FallbackInvoice>): FallbackInvoice | undefined {
+    const invoice = this.invoices.find((inv) => inv._id === id);
+    if (!invoice) return undefined;
+
+    Object.assign(invoice, data);
+    invoice.updatedAt = new Date();
+
+    const total = Number(invoice.total) || 0;
+    const paidAmount = Number(invoice.paidAmount) || 0;
+
+    if (paidAmount >= total && total > 0) {
+      invoice.status = 'paid';
+    } else if (paidAmount > 0) {
+      invoice.status = 'partially_paid';
+    } else {
+      invoice.status = 'issued';
+    }
+
+    invoice.dueAmount = Math.max(total - paidAmount, 0);
+
+    return invoice;
   }
 }
 

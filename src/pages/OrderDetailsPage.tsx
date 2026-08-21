@@ -2,9 +2,10 @@ import React, { useEffect, useState } from 'react';
 import { useParams, Link, useLocation } from 'react-router-dom';
 import { Order } from '../types/order';
 import { orderService } from '../services/orderService';
+import { invoiceService } from '../services/invoiceService';
 import { LoadingSpinner } from '../components/common/LoadingSpinner';
 import { ErrorAlert } from '../components/common/ErrorAlert';
-import { Package, ArrowLeft, MapPin, Phone, User, CreditCard, CheckCircle2, Clock, Calendar } from 'lucide-react';
+import { Package, ArrowLeft, MapPin, Phone, User, CreditCard, CheckCircle2, Clock, Calendar, Receipt } from 'lucide-react';
 
 export const OrderDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,6 +13,7 @@ export const OrderDetailsPage: React.FC = () => {
   const [order, setOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [invoiceId, setInvoiceId] = useState<string | null>(null);
 
   const successMessage = (location.state as any)?.message;
 
@@ -25,6 +27,14 @@ export const OrderDetailsPage: React.FC = () => {
         setOrder(data.order);
         if (data.order?._id) {
           document.title = `Order #${data.order._id} | Hamro Pustak Bhandar`;
+        }
+        try {
+          const inv = await invoiceService.getInvoiceByOrderId(id);
+          if (inv.invoice?._id) {
+            setInvoiceId(inv.invoice._id);
+          }
+        } catch {
+          setInvoiceId(null);
         }
       } catch (err: any) {
         setError(err.response?.data?.message || 'Failed to load order details.');
@@ -74,6 +84,15 @@ export const OrderDetailsPage: React.FC = () => {
           <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
           <span>{successMessage}</span>
         </div>
+      )}
+
+      {invoiceId && (
+        <Link
+          to={`/invoices/${invoiceId}`}
+          className="inline-flex items-center gap-2 px-4 py-2 bg-purple-100 hover:bg-purple-200 text-purple-700 rounded-xl text-xs font-bold transition"
+        >
+          <Receipt className="w-4 h-4" /> View Invoice
+        </Link>
       )}
 
       {/* Main Order Card */}

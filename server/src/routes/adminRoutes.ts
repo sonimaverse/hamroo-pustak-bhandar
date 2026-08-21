@@ -4,6 +4,7 @@ import { OrderController } from '../controllers/orderController.js';
 import { AdminController } from '../controllers/adminController.js';
 import { EnquiryController } from '../controllers/enquiryController.js';
 import { QuotationController } from '../controllers/quotationController.js';
+import { InvoiceController } from '../controllers/invoiceController.js';
 import { protect } from '../middleware/authMiddleware.js';
 import { authorize } from '../middleware/roleMiddleware.js';
 
@@ -23,6 +24,27 @@ router.get(
   protect,
   authorize('admin'),
   AdminController.getUsers
+);
+
+router.put(
+  '/users/:id/deactivate',
+  protect,
+  authorize('admin'),
+  AdminController.deactivateUser
+);
+
+router.put(
+  '/users/:id/reactivate',
+  protect,
+  authorize('admin'),
+  AdminController.reactivateUser
+);
+
+router.put(
+  '/users/:id/revoke-wholesale',
+  protect,
+  authorize('admin'),
+  AdminController.revokeWholesale
 );
 
 // Admin Wholesale Applications Management
@@ -104,6 +126,28 @@ router.get(
   protect,
   authorize('admin'),
   QuotationController.listAll
+);
+
+// Admin Invoice / Billing Management
+router.post(
+  '/invoices/generate/:orderId',
+  protect,
+  authorize('admin'),
+  InvoiceController.generateFromOrder
+);
+
+router.get(
+  '/invoices',
+  protect,
+  authorize('admin'),
+  InvoiceController.listAll
+);
+
+router.post(
+  '/invoices/:id/payments',
+  protect,
+  authorize('admin'),
+  InvoiceController.recordPayment
 );
 
 export default router;

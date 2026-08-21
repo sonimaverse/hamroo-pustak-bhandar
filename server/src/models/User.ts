@@ -21,6 +21,20 @@ export interface IUser extends Document {
   address?: IAddress;
   role: UserRole;
   wholesaleStatus: WholesaleStatus;
+
+  /*
+   * Password reset token (SHA-256 hash) and expiry.
+   * Both excluded from default queries via schema-level select: false.
+   */
+  passwordResetToken?: string;
+  passwordResetExpires?: Date;
+
+  /*
+   * Activation flag. Deactivated users cannot authenticate but all their
+   * historical records (Orders, Invoices, WholesaleProfile) are preserved.
+   */
+  isActive: boolean;
+
   createdAt: Date;
   updatedAt: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
@@ -71,6 +85,34 @@ const UserSchema = new Schema<IUser>(
       enum: ['none', 'pending', 'approved', 'rejected'],
       default: 'none',
     },
+
+    /*
+     * Password reset token (SHA-256 hash of the raw token).
+     * Stored as a hash so a database leak cannot be used to reset passwords.
+     */
+    passwordResetToken: {
+      type: String,
+      select: false,
+    },
+
+    /*
+     * Password reset token expiry.
+     * Token is single-use: cleared from the document once consumed.
+     */
+    passwordResetExpires: {
+      type: Date,
+      select: false,
+    },
+
+    /*
+     * Activation flag. Deactivated users cannot authenticate but all their
+     * historical records are preserved. Defaults to true so existing users
+     * remain active.
+     */
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
@@ -97,6 +139,8 @@ UserSchema.methods.comparePassword = async function (candidatePassword: string):
 UserSchema.methods.toSafeObject = function (): Record<string, any> {
   const userObj = this.toObject();
   delete userObj.password;
+  delete userObj.passwordResetToken;
+  delete userObj.passwordResetExpires;
   delete userObj.__v;
   return userObj;
 };

@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { User, Mail, Phone, Shield, Briefcase, Package, ArrowRight, CheckCircle, Clock, Edit2, Save, X, MapPin } from 'lucide-react';
+import { User, Mail, Phone, Shield, Briefcase, Package, ArrowRight, CheckCircle, Clock, Edit2, Save, X, MapPin, Lock, Eye, EyeOff } from 'lucide-react';
 import { ErrorAlert } from '../components/common/ErrorAlert';
 
 export const ProfilePage: React.FC = () => {
-  const { user, updateProfile } = useAuth();
+  const { user, updateProfile, changePassword } = useAuth();
   
   const [editing, setEditing] = useState(false);
   const [name, setName] = useState(user?.name || '');
@@ -18,6 +18,15 @@ export const ProfilePage: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+
+  const [showChangePassword, setShowChangePassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmNewPassword, setConfirmNewPassword] = useState('');
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
+  const [passwordSaving, setPasswordSaving] = useState(false);
+  const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [passwordSuccess, setPasswordSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     document.title = 'My Profile | Hamro Pustak Bhandar';
@@ -56,6 +65,44 @@ export const ProfilePage: React.FC = () => {
       setError(err.response?.data?.message || 'Failed to update profile.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPasswordError(null);
+    setPasswordSuccess(null);
+
+    if (!currentPassword || !newPassword || !confirmNewPassword) {
+      setPasswordError('Please fill in all password fields.');
+      return;
+    }
+    if (newPassword.length < 6) {
+      setPasswordError('New password must be at least 6 characters long.');
+      return;
+    }
+    if (newPassword !== confirmNewPassword) {
+      setPasswordError('New passwords do not match.');
+      return;
+    }
+    if (currentPassword === newPassword) {
+      setPasswordError('New password must be different from the current password.');
+      return;
+    }
+
+    try {
+      setPasswordSaving(true);
+      await changePassword({ currentPassword, password: newPassword, confirmPassword: confirmNewPassword });
+      setPasswordSuccess('Password changed successfully!');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmNewPassword('');
+      setShowPasswordFields(false);
+      setShowChangePassword(false);
+    } catch (err: any) {
+      setPasswordError(err.response?.data?.message || 'Failed to change password.');
+    } finally {
+      setPasswordSaving(false);
     }
   };
 
@@ -292,6 +339,102 @@ export const ProfilePage: React.FC = () => {
                 <CheckCircle className="w-3.5 h-3.5" /> Verified Token
               </span>
             </div>
+
+            {!showChangePassword && (
+              <button
+                type="button"
+                onClick={() => {
+                  setShowChangePassword(true);
+                  setPasswordError(null);
+                  setPasswordSuccess(null);
+                }}
+                className="w-full px-4 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-800 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2"
+              >
+                <Lock className="w-4 h-4" />
+                <span>Change Password</span>
+              </button>
+            )}
+
+            {showChangePassword && (
+              <form onSubmit={handleChangePassword} className="space-y-3 pt-2">
+                {passwordError && (
+                  <ErrorAlert message={passwordError} onClose={() => setPasswordError(null)} />
+                )}
+                {passwordSuccess && (
+                  <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-800 flex items-center gap-2">
+                    <CheckCircle className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>{passwordSuccess}</span>
+                  </div>
+                )}
+
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1 text-[11px]">Current Password</label>
+                  <input
+                    type={showPasswordFields ? 'text' : 'password'}
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-xl text-xs text-stone-900"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1 text-[11px]">New Password</label>
+                  <input
+                    type={showPasswordFields ? 'text' : 'password'}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-xl text-xs text-stone-900"
+                    required
+                  />
+                </div>
+
+                <div>
+                  <label className="block font-bold text-stone-700 mb-1 text-[11px]">Confirm New Password</label>
+                  <input
+                    type={showPasswordFields ? 'text' : 'password'}
+                    value={confirmNewPassword}
+                    onChange={(e) => setConfirmNewPassword(e.target.value)}
+                    className="w-full px-3 py-2 bg-white border border-stone-200 rounded-xl text-xs text-stone-900"
+                    required
+                  />
+                </div>
+
+                <label className="flex items-center gap-2 text-[11px] text-stone-600 font-medium cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={showPasswordFields}
+                    onChange={(e) => setShowPasswordFields(e.target.checked)}
+                    className="rounded border-stone-300"
+                  />
+                  Show passwords
+                </label>
+
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowChangePassword(false);
+                      setCurrentPassword('');
+                      setNewPassword('');
+                      setConfirmNewPassword('');
+                      setPasswordError(null);
+                      setPasswordSuccess(null);
+                    }}
+                    className="flex-1 px-4 py-2 border border-stone-300 rounded-xl text-xs font-bold text-stone-700 hover:bg-stone-100"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={passwordSaving}
+                    className="flex-1 px-4 py-2 bg-red-700 hover:bg-red-800 text-white rounded-xl text-xs font-bold disabled:opacity-50"
+                  >
+                    {passwordSaving ? 'Saving...' : 'Update Password'}
+                  </button>
+                </div>
+              </form>
+            )}
           </div>
         </div>
 

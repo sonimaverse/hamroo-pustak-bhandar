@@ -1,3 +1,4 @@
+import crypto from 'crypto';
 import { User } from '../models/User.js';
 import { Category } from '../models/Category.js';
 import { getDbStatus } from '../config/db.js';
@@ -12,18 +13,21 @@ export class SeedService {
 
     try {
       // ============================================================
-      // 1. ENSURE PERMANENT ADMIN ACCOUNT EXISTS
+      // 1. ENSURE DEFAULT ADMIN ACCOUNT EXISTS
       // ============================================================
+      // The initial admin password is generated at runtime, printed once to
+      // the server console, and never hard-coded. The admin should change
+      // it on first login using the change-password flow.
 
-      const adminEmail = 'sonimapokhrel017@gmail.com';
-      const adminPassword = 'SonimaAdmin2026';
+      const adminEmail = process.env.ADMIN_SEED_EMAIL || 'admin@hamropustak.com';
+      const adminPassword = crypto.randomBytes(12).toString('hex');
 
       const existingAdmin = await User.findOne({
         email: adminEmail.toLowerCase(),
       });
 
       if (!existingAdmin) {
-        console.log('🌱 [MongoDB Seed] Creating permanent administrator...');
+        console.log('🌱 [MongoDB Seed] Creating default administrator...');
 
         await User.create({
           name: 'Store Administrator',
@@ -41,9 +45,11 @@ export class SeedService {
           wholesaleStatus: 'none',
         });
 
-        console.log(
-          `✅ [MongoDB Seed] Permanent admin created: ${adminEmail}`
-        );
+        console.log(`✅ [MongoDB Seed] Default admin created: ${adminEmail}`);
+        console.log('========================================================');
+        console.log(`🔑 INITIAL ADMIN PASSWORD: ${adminPassword}`);
+        console.log('   Change this password immediately after first login.');
+        console.log('========================================================');
       } else if (existingAdmin.role !== 'admin') {
         existingAdmin.role = 'admin';
         existingAdmin.wholesaleStatus = 'none';

@@ -43,6 +43,12 @@ interface AuthContextType {
       country?: string;
     };
   }) => Promise<void>;
+
+  changePassword: (data: {
+    currentPassword: string;
+    password: string;
+    confirmPassword: string;
+  }) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(
@@ -351,8 +357,20 @@ export const AuthProvider: React.FC<{
   };
 
   /* =========================================================
-     CONTEXT VALUE
-  ========================================================= */
+      CHANGE PASSWORD
+   ========================================================= */
+
+  const changePassword = async (data: {
+    currentPassword: string;
+    password: string;
+    confirmPassword: string;
+  }): Promise<void> => {
+    await authService.changePassword(data);
+  };
+
+  /* =========================================================
+      CONTEXT VALUE
+   ========================================================= */
 
   const contextValue: AuthContextType = {
     user,
@@ -367,6 +385,8 @@ export const AuthProvider: React.FC<{
     refreshUser,
 
     updateProfile,
+
+    changePassword,
   };
 
   return (

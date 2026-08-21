@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, Heart, Mail, Phone, MapPin } from 'lucide-react';
+import { BookOpen, Mail, Phone, MapPin } from 'lucide-react';
 
 export const Footer: React.FC = () => {
   return (
@@ -72,17 +72,17 @@ export const Footer: React.FC = () => {
             </ul>
           </div>
 
-{/* Business Hours & Support */}
-<div className="space-y-3">
-  <h4 className="text-sm font-bold text-white uppercase tracking-wider">
-    Customer Support
-  </h4>
+          {/* Customer Support */}
+          <div className="space-y-3">
+            <h4 className="text-sm font-bold text-white uppercase tracking-wider">
+              Customer Support
+            </h4>
 
-  <ul className="space-y-2 text-xs text-stone-400">
-    <li>Open Everyday: 9:00 AM - 6:00 PM</li>
-    <li>Book Orders • Wholesale • Customer Support</li>
-  </ul>
-</div>
+            <ul className="space-y-2 text-xs text-stone-400">
+              <li>Open Everyday: 9:00 AM - 6:00 PM</li>
+              <li>Book Orders • Wholesale • Customer Support</li>
+            </ul>
+          </div>
 
           {/* Contact Details */}
           <div className="space-y-3">
@@ -141,24 +141,12 @@ export const Footer: React.FC = () => {
           </p>
 
           <div className="flex items-center gap-4 text-[11px]">
-
             <Link
               to="/dev/api-inspector"
               className="text-stone-500 hover:text-stone-300 transition"
             >
               API Inspector
             </Link>
-
-            <div className="flex items-center gap-1">
-              <span>Crafted with</span>
-
-              <Heart className="w-3.5 h-3.5 text-red-500 fill-red-500 inline" />
-
-              <span>
-                for literature and education in Nepal.
-              </span>
-            </div>
-
           </div>
 
         </div>
